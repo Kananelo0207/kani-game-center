@@ -3,10 +3,8 @@ using Microsoft.EntityFrameworkCore;
 using GameCenterApi.Data;
 using GameCenterApi.Models;
 using GameCenterApi.DTOs;
-using System.Security.Claims;
-using Microsoft.IdentityModel.Tokens;
-using System.IdentityModel.Tokens.Jwt;
-using System.Text;
+using GameCenterApi.Services;
+using BCrypt.Net;
 
 namespace GameCenterApi.Controllers;
 
@@ -15,28 +13,28 @@ namespace GameCenterApi.Controllers;
 public class AuthController : ControllerBase
 {
     private readonly GameContext _context;
-    private readonly IConfiguration _configuration;
+    private readonly IAuthService _authService;
 
-    public AuthController(GameContext context, IConfiguration configuration)
+    public AuthController(GameContext context, IAuthService authService)
     {
         _context = context;
-        _configuration = configuration;
+        _authService = authService;
     }
 
     [HttpPost("register")]
     public async Task<IActionResult> Register([FromBody] UserAuthDto request)
     {
-        if (await _context.Players.AnyAsync(p => p.Name == request.Name))
-        {
-            return BadRequest("Player already exists.");
-        }
+        // Simple validation check
+        if (string.IsNullOrWhiteSpace(request.Password) || request.Password.Length < 6)
+            return BadRequest("Password must be at least 6 characters long.");
 
-        string passwordHash = BCrypt.Net.BCrypt.HashPassword(request.Password);
+        if (await _context.Players.AnyAsync(p => p.Name == request.Name))
+            return BadRequest("Player already exists.");
 
         var newPlayer = new Player 
         { 
             Name = request.Name, 
-            PasswordHash = passwordHash 
+            PasswordHash = _authService.HashPassword(request.Password) 
         };
 
         _context.Players.Add(newPlayer);
@@ -50,37 +48,11 @@ public class AuthController : ControllerBase
     {
         var player = await _context.Players.FirstOrDefaultAsync(p => p.Name == request.Name);
         
-        if (player == null || !BCrypt.Net.BCrypt.Verify(request.Password, player.PasswordHash))
+        if (player == null || !_authService.VerifyPassword(request.Password, player.PasswordHash))
         {
             return BadRequest("Invalid credentials."); 
         }
 
-        string token = CreateToken(player);
-        
-        return Ok(new { token });
-    }
-
-    private string CreateToken(Player player)
-    {
-        var claims = new List<Claim> {
-            new Claim(ClaimTypes.Name, player.Name),
-            new Claim(ClaimTypes.NameIdentifier, player.Id.ToString())
-        };
-
-        var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(
-            _configuration.GetSection("AppSettings:Token").Value!));
-
-        var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha512Signature);
-
-        var tokenDescriptor = new SecurityTokenDescriptor {
-            Subject = new ClaimsIdentity(claims),
-            Expires = DateTime.Now.AddDays(1), 
-            SigningCredentials = creds
-        };
-
-        var tokenHandler = new JwtSecurityTokenHandler();
-        var token = tokenHandler.CreateToken(tokenDescriptor);
-
-        return tokenHandler.WriteToken(token);
+        return Ok(new { token = _authService.CreateToken(player) });
     }
 }

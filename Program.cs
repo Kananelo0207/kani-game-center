@@ -35,7 +35,7 @@ builder.Services.AddCors(options =>
     });
 });
 builder.Services.AddOpenApi();
-
+builder.Services.AddScoped<IAuthService, AuthService>();
 var app = builder.Build();
 
 if (app.Environment.IsDevelopment())
@@ -45,8 +45,10 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 app.UseDefaultFiles(); 
+
 app.UseStaticFiles();  
 app.UseCors("AllowGitHubPages");
+
 app.UseAuthentication(); 
 app.UseAuthorization();  
 

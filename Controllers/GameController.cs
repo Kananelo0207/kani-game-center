@@ -10,6 +10,7 @@ namespace GameCenterApi.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
+[Authorize] // Every method requires a login by default
 public class GameController : ControllerBase
 {
     private readonly GameContext _context;
@@ -19,22 +20,34 @@ public class GameController : ControllerBase
         _context = context;
     }
 
-    [HttpGet("me"), Authorize]
+    [HttpGet("me")]
     public IActionResult GetMyProfile()
     {
-        var userName = User.FindFirstValue(ClaimTypes.Name);
-        return Ok(new { message = $"Welcome back, {userName}!" });
+        var userName = User.Identity?.Name;
+        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+        return Ok(new { 
+            message = $"Welcome back, {userName}!",
+            id = userId 
+        });
     }
 
-    [HttpPost("submit-score"), Authorize]
-    public async Task<IActionResult> SubmitScore([FromBody] ScoreDto scoreDto) // Use the DTO here
+    [HttpPost("submit-score")]
+    public async Task<IActionResult> SubmitScore([FromBody] ScoreDto scoreDto)
     {
-        var userName = User.FindFirstValue(ClaimTypes.Name);
+        // 1. Get the ID and Name directly from the secure Token
+        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        var userName = User.Identity?.Name;
 
+        if (string.IsNullOrEmpty(userId)) return Unauthorized();
+
+        // 2. Create the score linked to the ID
         var score = new HighScore
         {
+            PlayerId = int.Parse(userId), 
             PlayerName = userName!,
-            Points = scoreDto.Points // Pull the points from the DTO
+            Points = scoreDto.Points,
+            DateSubmitted = DateTime.UtcNow
         };
 
         _context.HighScores.Add(score);
@@ -44,6 +57,7 @@ public class GameController : ControllerBase
     }
 
     [HttpGet("leaderboard")]
+    [AllowAnonymous] 
     public async Task<IActionResult> GetLeaderboard()
     {
         var leaderboard = await _context.HighScores
