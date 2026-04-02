@@ -5,7 +5,7 @@ services:
     repo: https://github.com/Kananelo0207/kani-game-center # Replace with your repo URL
     plan: free
     dockerContext: .
-    dockerfilePath: GameCenterApi/Dockerfile # Points to the Dockerfile in your subfolder
+    dockerfilePath: Dockerfile # Points to the Dockerfile in your subfolder
     envVars:
       - key: ASPNETCORE_ENVIRONMENT
         value: Production
