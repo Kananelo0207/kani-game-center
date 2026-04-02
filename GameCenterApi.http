@@ -1,0 +1,68 @@
+@GameCenterApi_HostAddress = http://localhost:5216
+
+@GameCenterApi_HostAddress = http://localhost:5216
+
+GET {{GameCenterApi_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
+
+### Register a new player
+POST http://localhost:5216/api/auth/register
+Content-Type: application/json
+
+{
+  "name": "Kani",
+  "password": "MySuperSecretPassword123"
+}
+
+###
+
+### Login with Correct Password
+POST http://localhost:5216/api/auth/login
+Content-Type: application/json
+
+{
+  "name": "Kani",
+  "password": "MySuperSecretPassword123"
+}
+
+###
+
+### Login with WRONG Password
+POST http://localhost:5216/api/auth/login
+Content-Type: application/json
+
+{
+  "name": "Kani",
+  "password": "WrongPasswordOops"
+}
+
+### Test Protected Endpoint (This should fail with 401 Unauthorized at first)
+GET http://localhost:5216/api/game/secret-data
+
+###
+
+### Test Protected Endpoint WITH Token
+GET http://localhost:5216/api/game/secret-data
+Authorization: Bearer eyJhbGciOiJIUzUxMiIsInR5cCI6IkpXVCJ9.eyJ1bmlxdWVfbmFtZSI6IkthbmkiLCJuYW1laWQiOiIxIiwibmJmIjoxNzc1MDY4NTcxLCJleHAiOjE3NzUxNTQ5NzEsImlhdCI6MTc3NTA2ODU3MX0.3q-8pXwh3DJx6DR6LhJjVC8VmrJ6CjoarQrXuhds5_Ch2VR04tpO_AyByCyVRpVleISL4a5QgTmMkiguhgBMPA
+
+### 1. Get Profile (Requires Token)
+GET http://localhost:5216/api/game/me
+Authorization: Bearer eyJhbGciOiJIUzUxMiIsInR5cCI6IkpXVCJ9.eyJ1bmlxdWVfbmFtZSI6IkthbmkiLCJuYW1laWQiOiIxIiwibmJmIjoxNzc1MDcwNTAxLCJleHAiOjE3NzUxNTY5MDEsImlhdCI6MTc3NTA3MDUwMX0.sSFwh9Tif9-zq9XpW6dP_ksh7TwaH8ePR2gW8Jz_4-Z7N6Ntl9IvIJUdtC6XaXLJsoEqbgE-s7vpEp1hx8-aAQ
+
+###
+
+### Submit a Score (Corrected JSON format)
+POST http://localhost:5216/api/game/submit-score
+Authorization: Bearer eyJhbGciOiJIUzUxMiIsInR5cCI6IkpXVCJ9.eyJ1bmlxdWVfbmFtZSI6IkthbmkiLCJuYW1laWQiOiIxIiwibmJmIjoxNzc1MDc2MzIzLCJleHAiOjE3NzUxNjI3MjMsImlhdCI6MTc3NTA3NjMyM30.hMZgkSLi05JnSmaQqAO5pohP1AvECYcEOPqsfGcIhDKWxabN0qtgWYIBC01wOy-YNlhGLrMHZ0Mpq654063pXA
+Content-Type: application/json
+
+{
+  "points": 5000
+}
+
+###
+
+### 3. See the Leaderboard
+GET http://localhost:5216/api/game/leaderboard
