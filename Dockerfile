@@ -4,7 +4,7 @@ WORKDIR /src
 
 # Copy everything and build the release version
 COPY . ./
-RUN dotnet publish "GAME-CENTER.sln" -c Release -o /app/publish
+RUN dotnet publish "GameCenterApi/GameCenterApi.csproj" -c Release -o /app/publish
 
 # Step 2: Use the lighter .NET runtime to actually run the app
 FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS runtime
