@@ -7,5 +7,9 @@ services:
     dockerContext: .
     dockerfilePath: Dockerfile # Points to the Dockerfile in your subfolder
     envVars:
+    - key: PORT
+    value: 10000
+    - key: ASPNETCORE_URLS
+    value: http://+:10000
       - key: ASPNETCORE_ENVIRONMENT
         value: Production
