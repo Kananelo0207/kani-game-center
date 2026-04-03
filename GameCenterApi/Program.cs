@@ -59,7 +59,7 @@ if (app.Environment.IsDevelopment())
 }
 
 // Order matters here!
-app.UseHttpsRedirection();
+//app.UseHttpsRedirection();
 app.UseDefaultFiles(); 
 app.UseStaticFiles();  
 app.UseCors("AllowAll"); 
