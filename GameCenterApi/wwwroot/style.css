@@ -264,3 +264,59 @@ body
     height: 150px;
   }
 }
+
+/* Glassmorphism Design */
+body {
+    margin: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    background-color: #1a1a1a; /* Backup color */
+    color: white;
+    font-family: 'Segoe UI', sans-serif;
+}
+
+.main-wrap {
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    padding: 2rem;
+    border-radius: 15px;
+    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.5);
+    text-align: center;
+    width: 320px;
+}
+
+input {
+    width: 100%;
+    padding: 10px;
+    margin: 10px 0;
+    border-radius: 5px;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    background: rgba(0, 0, 0, 0.2);
+    color: white;
+}
+
+button {
+    width: 100%;
+    padding: 10px;
+    background-color: #6c5ce7;
+    border: none;
+    color: white;
+    border-radius: 5px;
+    cursor: pointer;
+    font-weight: bold;
+    margin-top: 10px;
+}
+
+button:hover {
+    background-color: #a29bfe;
+}
+
+a {
+    color: #a29bfe;
+    text-decoration: none;
+    font-size: 0.9rem;
+}

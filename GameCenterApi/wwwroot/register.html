@@ -8,23 +8,39 @@
 </head>
 <body>
     <div class="main-wrap">
-        <h1>Register</h1>
+        <h1>🎮 Register</h1>
         <input type="text" id="reg-name" placeholder="Choose Username">
         <input type="password" id="reg-pass" placeholder="Choose Password">
-        <button onclick="register()">Create Account</button>
+        <button class="sign-in-btn" onclick="register()">Create Account</button>
         <p><a href="signin.html">Back to Sign In</a></p>
     </div>
+
     <script>
         async function register() {
             const name = document.getElementById('reg-name').value;
             const pass = document.getElementById('reg-pass').value;
-            const resp = await fetch('/api/auth/register', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ Username: name, Password: pass })
-            });
-            if (resp.ok) { alert('Lets Go!!!, Now Log In.'); window.location.href = 'signin.html'; }
-            else { alert('Error creating account.'); }
+            
+            if (!name || !pass) {
+                alert("Please enter both a name and password.");
+                return;
+            }
+
+            try {
+                const resp = await fetch('/api/auth/register', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ Username: name, Password: pass })
+                });
+
+                if (resp.ok) { 
+                    alert('Lets Go!!!, Now Log In.'); 
+                    window.location.href = 'signin.html'; 
+                } else { 
+                    alert('Error creating account. That name might be taken.'); 
+                }
+            } catch (err) {
+                alert('Connection error. Is the server live?');
+            }
         }
     </script>
 </body>
