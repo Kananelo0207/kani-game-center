@@ -77,7 +77,7 @@
             <p>Create a new player profile.</p>
 
             <input type="text" id="reg-name" placeholder="Choose Username">
-            <input type="password" id="reg-pass" placeholder="Choose Password">
+            <input type="password" id="reg-pass" minlength="6" placeholder="Password (Min 6 chars, 1 Upper, 1 Number, 1 Symbol)">
             
             <button class="signin-btn" onclick="register()">Create Account</button>
             <div class="error" id="errorMessage"></div>
@@ -97,8 +97,17 @@
             const pass = document.getElementById('reg-pass').value.trim();
             const errorMsg = document.getElementById("errorMessage");
             
+            // Clear old errors
+            errorMsg.textContent = "";
+
             if (!name || !pass) {
                 errorMsg.textContent = "Please enter both a name and password.";
+                return;
+            }
+
+            // NEW: Stop them before the server crashes
+            if (pass.length < 6) {
+                errorMsg.textContent = "Password must be at least 6 characters long.";
                 return;
             }
 
@@ -111,10 +120,11 @@
 
                 if (resp.ok) { 
                     alert('Success! Your account is created. Sending you to Sign In.'); 
-                    // AUTOMATED REDIRECT HERE
                     window.location.href = 'signin.html'; 
-                } else { 
-                    errorMsg.textContent = 'Error: That username might already be taken.'; 
+                } 
+                else { 
+                    // If it still fails, it might be a weak password or a taken name
+                    errorMsg.textContent = 'Error: Username taken OR password needs a capital letter, number, and symbol (!@#).'; 
                 }
             } catch (err) {
                 errorMsg.textContent = 'Connection error. Please try again.';
