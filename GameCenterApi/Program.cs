@@ -53,7 +53,7 @@ var app = builder.Build();
 using (var scope = app.Services.CreateScope())
 {
     var context = scope.ServiceProvider.GetRequiredService<GameContext>();
-    context.Database.Migrate();
+    context.Database.EnsureCreated();
 }
 
 // 6. CONFIGURE PIPELINE
