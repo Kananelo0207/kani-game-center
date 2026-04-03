@@ -10,7 +10,7 @@ var builder = WebApplication.CreateBuilder(args);
 
 // 1. DATABASE CONNECTION (Now using Absolute Path for Cloud)
 // This ensures Render finds the database file no matter what folder it starts in.
-var dbPath = Path.Combine(AppContext.BaseDirectory, "game.db");
+var dbPath = Path.Combine(AppContext.BaseDirectory, "GameCenterLive.db");
 builder.Services.AddDbContext<GameContext>(options =>
     options.UseSqlite($"Data Source={dbPath}")); 
 
