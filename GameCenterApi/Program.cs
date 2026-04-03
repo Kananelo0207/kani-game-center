@@ -8,11 +8,13 @@ using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// 1. DATABASE CONNECTION
+// 1. DATABASE CONNECTION (Now using Absolute Path for Cloud)
+// This ensures Render finds the database file no matter what folder it starts in.
+var dbPath = Path.Combine(AppContext.BaseDirectory, "game.db");
 builder.Services.AddDbContext<GameContext>(options =>
-    options.UseSqlite("Data Source=game.db")); 
+    options.UseSqlite($"Data Source={dbPath}")); 
 
-// 2. REGISTER YOUR AUTH SERVICE (The Missing Link)
+// 2. REGISTER YOUR AUTH SERVICE
 builder.Services.AddScoped<IAuthService, AuthService>();
 
 // 3. JWT AUTHENTICATION
@@ -31,7 +33,7 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 
 builder.Services.AddControllers();
 
-// 4. CORS POLICY (Updated to Allow All for easier testing)
+// 4. CORS POLICY
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowAll", policy =>
@@ -46,20 +48,23 @@ builder.Services.AddOpenApi();
 
 var app = builder.Build();
 
+// 5. AUTO-MIGRATION (The "Table Builder")
+// This runs every time the app starts to ensure the 'Players' table exists.
 using (var scope = app.Services.CreateScope())
 {
     var context = scope.ServiceProvider.GetRequiredService<GameContext>();
     context.Database.Migrate();
 }
 
-// 5. CONFIGURE PIPELINE
+// 6. CONFIGURE PIPELINE
 if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
 }
 
-// Order matters here!
-//app.UseHttpsRedirection();
+// NOTE: UseHttpsRedirection is commented out for Render compatibility
+// app.UseHttpsRedirection();
+
 app.UseDefaultFiles(); 
 app.UseStaticFiles();  
 app.UseCors("AllowAll"); 
@@ -68,4 +73,5 @@ app.UseAuthentication();
 app.UseAuthorization();  
 
 app.MapControllers();
+
 app.Run();
