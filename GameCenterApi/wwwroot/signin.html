@@ -52,10 +52,13 @@
       font-size: 16px;
       transition: transform .18s ease;
       box-shadow: 0 12px 28px rgba(0,0,0,.28);
+      margin-bottom: 15px;
     }
 
     .signin-btn:hover { transform: translateY(-1px); }
-    .error { margin-top: 12px; color: #fda4af; font-size: 14px; min-height: 20px; }
+    .error { color: #fda4af; font-size: 14px; min-height: 20px; margin-bottom: 10px; }
+    .reg-link { color: #a29bfe; text-decoration: none; font-weight: bold; transition: 0.2s;}
+    .reg-link:hover { color: white; }
   </style>
 </head>
 
@@ -77,13 +80,14 @@
       <input type="password" id="playerPassword" placeholder="Enter Password" />
       
       <button class="signin-btn" onclick="signIn()">Enter Game Center</button>
-
+      
       <div class="error" id="errorMessage"></div>
+
+      <p style="font-size: 14px;">First time playing? <br><br> <a class="reg-link" href="register.html">Create an Account Here</a></p>
     </div>
   </main>
 
   <script>
-    // Mouse movement effect
     document.addEventListener("mousemove", (e) => {
       document.documentElement.style.setProperty("--mx", (e.clientX / window.innerWidth) * 100 + "%");
       document.documentElement.style.setProperty("--my", (e.clientY / window.innerHeight) * 100 + "%");
@@ -100,24 +104,22 @@
       }
 
       try {
-
-      const response = await fetch('/api/auth/login', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ name, password })
-    });
+        const response = await fetch('/api/auth/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ name, password })
+        });
 
         if (response.ok) {
           const data = await response.json();
-          
           localStorage.setItem("jwt_token", data.token);
           localStorage.setItem("playerName", name);
-          window.location.href = "index.html";
+          window.location.href = "index.html"; // Send to games!
         } else {
           errorMsg.textContent = "Invalid login. Check your credentials.";
         }
       } catch (err) {
-        errorMsg.textContent = "Cannot connect to the server. Please try again later.";
+        errorMsg.textContent = "Cannot connect to the server right now.";
       }
     }
   </script>

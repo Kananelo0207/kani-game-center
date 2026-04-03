@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
@@ -32,10 +31,16 @@
       transform: translateY(-2px);
     }
   </style>
+
+  <script>
+    // THE GATEKEEPER: Runs instantly before the page even paints
+    if (!localStorage.getItem("jwt_token") || !localStorage.getItem("playerName")) {
+        window.location.href = "signin.html";
+    }
+  </script>
 </head>
 
 <body>
-
   <div class="bg" aria-hidden="true">
     <div class="blob b1"></div>
     <div class="blob b2"></div>
@@ -49,8 +54,7 @@
       <div>
         <p class="eyebrow">Have Fun</p>
         <h1 style="text-align: center;">🎮 Kani's Game Center 🎮</h1>
-        <p id="welcomePlayer" class="subtitle" style="text-align: center; font-weight: bold; color: white;">Checking session...</p>
-
+        <p id="welcomePlayer" class="subtitle" style="text-align: center; font-weight: bold; color: white;">Loading...</p>
         <p class="subtitle" style="text-align: center;">Pick A Game And Jump In Player.</p>
 
         <div style="text-align: center; display: flex; justify-content: center; gap: 15px; margin-bottom: 20px;">
@@ -121,27 +125,18 @@
   <script>
     const token = localStorage.getItem("jwt_token");
     const playerName = localStorage.getItem("playerName");
-    const welcomeText = document.getElementById("welcomePlayer");
-
-    // 1. Initial Local Check
-    if (!token || !playerName) {
-      window.location.href = "signin.html";
-    } else {
-      welcomeText.textContent = `Welcome back, ${playerName}! 🎮`;
-      // 2. Verified Backend Check (Optional but Pro)
-      verifyToken();
-    }
+    
+    // Set the welcome text since they passed the gatekeeper
+    document.getElementById("welcomePlayer").textContent = `Welcome back, ${playerName}! 🎮`;
+    
+    verifyToken();
 
     async function verifyToken() {
         try {
-            const response = await fetch('https://kani-game-center-api.onrender.com/api/game/me', {
+            const response = await fetch('/api/game/me', {
                 headers: { 'Authorization': `Bearer ${token}` }
             });
-            
-            if (!response.ok) {
-                // Token is invalid or expired
-                logout();
-            }
+            if (!response.ok) logout();
         } catch (err) {
             console.error("Auth server offline, staying in local mode.");
         }
@@ -152,13 +147,11 @@
       window.location.href = "signin.html";
     }
 
-    // Mouse Movement Logic
     function TrackMouseMovement(event) {
       document.documentElement.style.setProperty("--mx", (event.clientX / window.innerWidth) * 100 + "%");
       document.documentElement.style.setProperty("--my", (event.clientY / window.innerHeight) * 100 + "%");
     }
     document.addEventListener("mousemove", TrackMouseMovement);
   </script>
-
 </body>
 </html>
