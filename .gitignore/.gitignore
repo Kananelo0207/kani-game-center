@@ -1,3 +1,11 @@
-bin/
-obj/
+# Stop tracking compiled build folders anywhere in the project
+**/bin/
+**/obj/
+
+# Stop tracking local database files
 *.db
+*.db-journal
+
+# Stop tracking app settings
+appsettings.json
+appsettings.Development.json

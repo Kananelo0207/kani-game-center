@@ -8,11 +8,11 @@ using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// 1. DATABASE CONNECTION (Now using Absolute Path for Cloud)
-// This ensures Render finds the database file no matter what folder it starts in.
-var dbPath = Path.Combine(AppContext.BaseDirectory, "GameCenterLive.db");
+// 1. DATABASE CONNECTION (Now using Render PostgreSQL)
+// Converted your Render URL into the C# standard format
+var connectionString = builder.Configuration["RENDER_DB_URL"];
 builder.Services.AddDbContext<GameContext>(options =>
-    options.UseSqlite($"Data Source={dbPath}")); 
+    options.UseNpgsql(connectionString)); 
 
 // 2. REGISTER YOUR AUTH SERVICE
 builder.Services.AddScoped<IAuthService, AuthService>();
@@ -49,11 +49,11 @@ builder.Services.AddOpenApi();
 var app = builder.Build();
 
 // 5. AUTO-MIGRATION (The "Table Builder")
-// This runs every time the app starts to ensure the 'Players' table exists.
+// Changed to Migrate() so it reads your new Entity Framework Migrations folder
 using (var scope = app.Services.CreateScope())
 {
     var context = scope.ServiceProvider.GetRequiredService<GameContext>();
-    context.Database.EnsureCreated();
+    context.Database.Migrate(); 
 }
 
 // 6. CONFIGURE PIPELINE
