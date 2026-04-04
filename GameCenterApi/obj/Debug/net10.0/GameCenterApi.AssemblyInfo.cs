@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("GameCenterApi")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+38fc5623f4c1367c7081d196830cf90085ff3697")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+176884d1da793fafe1e9ea12fba955b640ad3775")]
 [assembly: System.Reflection.AssemblyProductAttribute("GameCenterApi")]
 [assembly: System.Reflection.AssemblyTitleAttribute("GameCenterApi")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
