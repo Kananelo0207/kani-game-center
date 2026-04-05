@@ -12,6 +12,10 @@ namespace GameCenterApi.Migrations
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
+            // We are commenting this out because the tables already exist in the Render Database.
+            // This prevents the "relation HighScores already exists" error.
+
+            /*
             migrationBuilder.CreateTable(
                 name: "HighScores",
                 columns: table => new
@@ -41,6 +45,7 @@ namespace GameCenterApi.Migrations
                 {
                     table.PrimaryKey("PK_Players", x => x.Id);
                 });
+            */
         }
 
         /// <inheritdoc />
