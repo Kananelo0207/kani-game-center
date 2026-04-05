@@ -8,7 +8,6 @@
     <link rel="stylesheet" href="style.css">
 
     <style>
-        /* Copied your beautiful Sign In styling so they match */
         .signin-box {
           max-width: 420px;
           margin: 100px auto;
@@ -105,11 +104,9 @@
         }
 
         try {
-            // Updated the URL to point to your live Render API
             const resp = await fetch('https://kani-game-center-api.onrender.com/api/auth/register', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                // CHANGED: Using "Name" instead of "Username" to match your C# DTO
                 body: JSON.stringify({ Name: name, Password: pass }) 
             });
 
@@ -118,7 +115,6 @@
                 window.location.href = 'signin.html'; 
             } 
             else { 
-                // This will now show the REAL error from your C# code (like "Player already exists")
                 const errorDetail = await resp.text();
                 errorMsg.textContent = errorDetail || "Registration failed. Try a different name.";
             }

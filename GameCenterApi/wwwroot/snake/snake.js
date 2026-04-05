@@ -634,7 +634,6 @@ function setSnakeDirectionFromInput(dir)
 
 const mobileButtons = [...document.querySelectorAll(".mobile-controls button")];
 
-// --- EVENT LISTENERS ---
 
 document.getElementById("startSingleBtn").onclick = () => runGame('single');
 document.getElementById("startMultiBtn").onclick = () => runGame('multi');

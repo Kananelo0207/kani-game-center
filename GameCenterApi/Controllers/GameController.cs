@@ -10,7 +10,7 @@ namespace GameCenterApi.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
-[Authorize] // Every method requires a login by default
+[Authorize] 
 public class GameController : ControllerBase
 {
     private readonly GameContext _context;
@@ -35,13 +35,11 @@ public class GameController : ControllerBase
     [HttpPost("submit-score")]
     public async Task<IActionResult> SubmitScore([FromBody] ScoreDto scoreDto)
     {
-        // 1. Get the ID and Name directly from the secure Token
         var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
         var userName = User.Identity?.Name;
 
         if (string.IsNullOrEmpty(userId)) return Unauthorized();
 
-        // 2. Create the score linked to the ID
         var score = new HighScore
         {
             PlayerId = int.Parse(userId), 
@@ -60,6 +58,7 @@ public class GameController : ControllerBase
     [AllowAnonymous] 
     public async Task<IActionResult> GetLeaderboard()
     {
+        // This query groups by name so each player only appears once with their total career points
         var leaderboard = await _context.HighScores
             .GroupBy(s => s.PlayerName)
             .Select(g => new 
@@ -68,7 +67,7 @@ public class GameController : ControllerBase
                 TotalPoints = g.Sum(s => s.Points) 
             })
             .OrderByDescending(s => s.TotalPoints)
-            .Take(10)
+            .Take(200) // CHANGED: Now supporting a massive Top 200 Hall of Fame!
             .ToListAsync();
 
         return Ok(leaderboard);
