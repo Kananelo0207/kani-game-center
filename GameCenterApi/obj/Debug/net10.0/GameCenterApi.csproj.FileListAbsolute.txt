@@ -193,12 +193,9 @@ C:\Users\kani4\Projects\GAME-CENTER\GameCenterApi\obj\Debug\net10.0\compressed\u
 C:\Users\kani4\Projects\GAME-CENTER\GameCenterApi\obj\Debug\net10.0\compressed\bwc7so7nz5-{0}-71a53xuk7g-71a53xuk7g.gz
 C:\Users\kani4\Projects\GAME-CENTER\GameCenterApi\obj\Debug\net10.0\compressed\snn312k293-{0}-ksk9grfqdx-ksk9grfqdx.gz
 C:\Users\kani4\Projects\GAME-CENTER\GameCenterApi\obj\Debug\net10.0\compressed\2j78qkefzh-{0}-9azcazcv6r-9azcazcv6r.gz
-C:\Users\kani4\Projects\GAME-CENTER\GameCenterApi\obj\Debug\net10.0\compressed\r89q95qbyg-{0}-rci0smjng0-rci0smjng0.gz
 C:\Users\kani4\Projects\GAME-CENTER\GameCenterApi\obj\Debug\net10.0\compressed\oonszdnvt8-{0}-zzhwld0yol-zzhwld0yol.gz
 C:\Users\kani4\Projects\GAME-CENTER\GameCenterApi\obj\Debug\net10.0\compressed\77bied0v0e-{0}-6wpuxaqc6w-6wpuxaqc6w.gz
 C:\Users\kani4\Projects\GAME-CENTER\GameCenterApi\obj\Debug\net10.0\compressed\44tttlmjr7-{0}-jiq4ihrigm-jiq4ihrigm.gz
-C:\Users\kani4\Projects\GAME-CENTER\GameCenterApi\obj\Debug\net10.0\compressed\y4vwohf9gr-{0}-a5gcg826fr-a5gcg826fr.gz
-C:\Users\kani4\Projects\GAME-CENTER\GameCenterApi\obj\Debug\net10.0\compressed\3qa71cfhyz-{0}-kqha9dcqxo-kqha9dcqxo.gz
 C:\Users\kani4\Projects\GAME-CENTER\GameCenterApi\obj\Debug\net10.0\compressed\29do3ix73u-{0}-ughvc11zc0-ughvc11zc0.gz
 C:\Users\kani4\Projects\GAME-CENTER\GameCenterApi\obj\Debug\net10.0\compressed\1318kgtpg9-{0}-5z1ppt1l0j-5z1ppt1l0j.gz
 C:\Users\kani4\Projects\GAME-CENTER\GameCenterApi\obj\Debug\net10.0\compressed\xdk65ljteh-{0}-5sdr5x71ed-5sdr5x71ed.gz
@@ -214,3 +211,6 @@ C:\Users\kani4\Projects\GAME-CENTER\GameCenterApi\obj\Debug\net10.0\refint\GameC
 C:\Users\kani4\Projects\GAME-CENTER\GameCenterApi\obj\Debug\net10.0\GameCenterApi.pdb
 C:\Users\kani4\Projects\GAME-CENTER\GameCenterApi\obj\Debug\net10.0\GameCenterApi.genruntimeconfig.cache
 C:\Users\kani4\Projects\GAME-CENTER\GameCenterApi\obj\Debug\net10.0\ref\GameCenterApi.dll
+C:\Users\kani4\Projects\GAME-CENTER\GameCenterApi\obj\Debug\net10.0\compressed\r89q95qbyg-{0}-5yyvhu2du4-5yyvhu2du4.gz
+C:\Users\kani4\Projects\GAME-CENTER\GameCenterApi\obj\Debug\net10.0\compressed\y4vwohf9gr-{0}-0zik6sv6f8-0zik6sv6f8.gz
+C:\Users\kani4\Projects\GAME-CENTER\GameCenterApi\obj\Debug\net10.0\compressed\3qa71cfhyz-{0}-pbqzuq4b8r-pbqzuq4b8r.gz

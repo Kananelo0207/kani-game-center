@@ -87,49 +87,45 @@
     </main>
 
     <script>
-        document.addEventListener("mousemove", (e) => {
-            document.documentElement.style.setProperty("--mx", (e.clientX / window.innerWidth) * 100 + "%");
-            document.documentElement.style.setProperty("--my", (e.clientY / window.innerHeight) * 100 + "%");
-        });
+    document.addEventListener("mousemove", (e) => {
+        document.documentElement.style.setProperty("--mx", (e.clientX / window.innerWidth) * 100 + "%");
+        document.documentElement.style.setProperty("--my", (e.clientY / window.innerHeight) * 100 + "%");
+    });
 
-        async function register() {
-            const name = document.getElementById('reg-name').value.trim();
-            const pass = document.getElementById('reg-pass').value.trim();
-            const errorMsg = document.getElementById("errorMessage");
-            
-            // Clear old errors
-            errorMsg.textContent = "";
+    async function register() {
+        const name = document.getElementById('reg-name').value.trim();
+        const pass = document.getElementById('reg-pass').value.trim();
+        const errorMsg = document.getElementById("errorMessage");
+        
+        errorMsg.textContent = "";
 
-            if (!name || !pass) {
-                errorMsg.textContent = "Please enter both a name and password.";
-                return;
-            }
-
-            // NEW: Stop them before the server crashes
-            if (pass.length < 6) {
-                errorMsg.textContent = "Password must be at least 6 characters long.";
-                return;
-            }
-
-            try {
-                const resp = await fetch('/api/auth/register', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ Username: name, Password: pass })
-                });
-
-                if (resp.ok) { 
-                    alert('Success! Your account is created. Sending you to Sign In.'); 
-                    window.location.href = 'signin.html'; 
-                } 
-                else { 
-                    // If it still fails, it might be a weak password or a taken name
-                    errorMsg.textContent = 'Error: Username taken OR password needs a capital letter, number, and symbol (!@#).'; 
-                }
-            } catch (err) {
-                errorMsg.textContent = 'Connection error. Please try again.';
-            }
+        if (!name || !pass) {
+            errorMsg.textContent = "Please enter both a name and password.";
+            return;
         }
-    </script>
+
+        try {
+            // Updated the URL to point to your live Render API
+            const resp = await fetch('https://kani-game-center-api.onrender.com/api/auth/register', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                // CHANGED: Using "Name" instead of "Username" to match your C# DTO
+                body: JSON.stringify({ Name: name, Password: pass }) 
+            });
+
+            if (resp.ok) { 
+                alert('Success! Your account is created.'); 
+                window.location.href = 'signin.html'; 
+            } 
+            else { 
+                // This will now show the REAL error from your C# code (like "Player already exists")
+                const errorDetail = await resp.text();
+                errorMsg.textContent = errorDetail || "Registration failed. Try a different name.";
+            }
+        } catch (err) {
+            errorMsg.textContent = 'Cannot connect to server. Check your internet.';
+        }
+    }
+</script>
 </body>
 </html>

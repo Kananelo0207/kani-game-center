@@ -12,8 +12,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace GameCenterApi.Migrations
 {
     [DbContext(typeof(GameContext))]
-    [Migration("20260404202947_InitialCreate")]
-    partial class InitialCreate
+    [Migration("20260405080613_FinalFixes")]
+    partial class FinalFixes
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
