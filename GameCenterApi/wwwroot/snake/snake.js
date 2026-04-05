@@ -284,7 +284,6 @@ const cols = 25;
 let cell = canvas.width / cols;
 
 let gameRunning = false;
-let isMultiplayerMode = false;
 let phase = "idle";
 let names = ["Player 1", "Player 2"];
 let scores = [0, 0];
@@ -468,35 +467,19 @@ function waitForContinue()
       done = true;
 
       window.removeEventListener("keydown", onKey);
+      
+      const singleBtn = document.getElementById("startSingleBtn");
+      const multiBtn = document.getElementById("startMultiBtn");
 
-      if (startBtn)
-      {
-        startBtn.removeEventListener("click", onStart);
-      }
-
-      mobileButtons.forEach((btn) =>
-      {
-        btn.removeEventListener("click", onMobile);
-      });
+      if (singleBtn) singleBtn.removeEventListener("click", onKey);
+      if (multiBtn) multiBtn.removeEventListener("click", onKey);
 
       res();
     };
 
     const onKey = () => finish();
-    const onStart = () => finish();
-    const onMobile = () => finish();
-
     window.addEventListener("keydown", onKey);
-
-    if (startBtn)
-    {
-      startBtn.addEventListener("click", onStart);
-    }
-
-    mobileButtons.forEach((btn) =>
-    {
-      btn.addEventListener("click", onMobile);
-    });
+    overlay.onclick = onKey;
   });
 }
 
@@ -563,23 +546,24 @@ async function runTurn(name, startOnLeft)
 
   phase = "gameover";
   await delay(800);
-  showOverlay("GAME OVER - SYNCING SCORE..."); // Added a status update
-
-  // 1. Update your local leaderboard (the 757-line logic)
+  
+  // 1. Update your local leaderboard
   updateLB(name, snake.score);
   leaderboardEl.textContent = lbText();
 
-  // 2. The API Connection: Refactored for stability
+  // 2. The API Connection:
   const savedPlayer = localStorage.getItem("playerName");
   const token = localStorage.getItem("jwt_token");
 
   if (name === savedPlayer && token) 
   {
-    await submitSnakeScore(snake.score); // Only syncs if logged in
+    showOverlay("GAME OVER - SYNCING SCORE..."); 
+    await submitSnakeScore(snake.score);
+    showOverlay(`FINAL SCORE: ${snake.score}\nScore Sent to Global Board!`);
   } 
-  else  
+  else   
   {
-    showOverlay("LOCAL MATCH FINISHED. TAP TO CONTINUE"); // Still lets them play!
+    showOverlay(`GAME OVER - ${name}: ${snake.score}\n\nTAP TO CONTINUE`);
   }
 
   await waitForContinue();
@@ -588,12 +572,9 @@ async function runTurn(name, startOnLeft)
   return snake.score;
 }
 
-function showResults(p1, p2)
+function showResults(p1, p2, s1, s2)
 {
   phase = "results";
-
-  const s1 = getPlayerScore(p1);
-  const s2 = getPlayerScore(p2);
 
   const result =
     s1 > s2
@@ -602,7 +583,7 @@ function showResults(p1, p2)
         ? `${p2} wins with ${s2}!`
         : `It's a tie! Both scored ${s1}.`;
 
-  showOverlay(`${result}\n\n${lbText()}\n\nTAP START OR CONTROLS TO CONTINUE`);
+  showOverlay(`${result}\n\nTAP TO GO TO MENU`);
 
   waitForContinue().then(() =>
   {
@@ -611,50 +592,34 @@ function showResults(p1, p2)
   });
 }
 
-async function runGame(mode) // 1. Added 'mode' as a parameter
-{
-  if (gameRunning) return;
-  
-  const p1 = localStorage.getItem("playerName");
-  gameRunning = true;
-
-  if (mode === "multi") {
-    // --- MULTIPLAYER PATH ---
-    const p2 = (prompt("Enter name for Player 2 (optional):", "Guest") || "Guest").trim();
-    names = [p1, p2];
-
-    await runTurn(p1, true);
-    await runTurn(p2, false);
-
-    showResults(p1, p2);
-  } else {
-    // --- SINGLE PLAYER PATH ---
-    names = [p1];
+async function runGame(mode) {
+    if (gameRunning) return;
     
-    await runTurn(p1, true); 
-    
-    // NOTE: Because your runTurn function already has the code:
-    // "if (name === savedPlayer && token) { await submitSnakeScore(...) }"
-    // It will automatically sync your score to Render right here!
-    
-    showOverlay("GAME OVER - CHECK THE LEADERBOARD!");
-  }
-
-  gameRunning = false;
-}
-
-function startOrResumeSnake()
-{
-  if (!gameRunning && phase === "idle")
-  {
-    runGame();
-    return;
-  }
-
-  if (phase === "gameover" || phase === "results")
-  {
+    gameRunning = true;
+    const p1 = localStorage.getItem("playerName");
     hideOverlay();
-  }
+
+    if (mode === "single") {
+        names = [p1];
+        await runTurn(p1, true); 
+        // Resetting after single player
+        await delay(1000);
+        resetAll();
+    } else {
+        const p2 = (prompt("Enter name for Player 2:", "Guest") || "Guest").trim();
+        names = [p1, p2];
+
+        const s1 = await runTurn(p1, true);
+        showOverlay(`Turn Over! ${p1}: ${s1}\nReady Player 2?`);
+        
+        await waitForContinue();
+        hideOverlay();
+
+        const s2 = await runTurn(p2, false);
+        showResults(p1, p2, s1, s2);
+    }
+
+    gameRunning = false; 
 }
 
 function setSnakeDirectionFromInput(dir)
@@ -669,19 +634,13 @@ function setSnakeDirectionFromInput(dir)
 
 const mobileButtons = [...document.querySelectorAll(".mobile-controls button")];
 
+// --- EVENT LISTENERS ---
+
+document.getElementById("startSingleBtn").onclick = () => runGame('single');
+document.getElementById("startMultiBtn").onclick = () => runGame('multi');
+
 window.addEventListener("keydown", (e) =>
 {
-  if (
-    !gameRunning &&
-    phase === "idle" &&
-    (e.key === " " || e.code === "Space" || e.key.startsWith("Arrow"))
-  )
-  {
-    e.preventDefault();
-    runGame();
-    return;
-  }
-
   if (e.key === "ArrowLeft") setSnakeDirectionFromInput("left");
   if (e.key === "ArrowRight") setSnakeDirectionFromInput("right");
   if (e.key === "ArrowUp") setSnakeDirectionFromInput("up");
@@ -693,19 +652,6 @@ mobileButtons.forEach((btn) =>
   btn.addEventListener("click", (e) =>
   {
     e.preventDefault();
-
-    if (!gameRunning && phase === "idle")
-    {
-      runGame();
-      return;
-    }
-
-    if (phase === "gameover" || phase === "results")
-    {
-      hideOverlay();
-      return;
-    }
-
     setSnakeDirectionFromInput(btn.dataset.dir);
   });
 });
@@ -727,19 +673,6 @@ canvas.addEventListener("touchend", (e) =>
   const dy = touch.clientY - touchStartY;
 
   if (Math.abs(dx) < 20 && Math.abs(dy) < 20) return;
-
-  if (!gameRunning && phase === "idle")
-  {
-    runGame();
-    return;
-  }
-
-  if (phase === "gameover" || phase === "results")
-  {
-    hideOverlay();
-    return;
-  }
-
   if (Math.abs(dx) > Math.abs(dy))
   {
     setSnakeDirectionFromInput(dx > 0 ? "right" : "left");
@@ -756,11 +689,6 @@ if (restartBtn)
   {
     resetAll();
   });
-}
-
-if (startBtn)
-{
-  startBtn.addEventListener("click", startOrResumeSnake);
 }
 
 window.addEventListener("resize", resizeCanvas);
@@ -780,17 +708,17 @@ async function submitSnakeScore(finalScore) {
                 'Content-Type': 'application/json',
                 'Authorization': `Bearer ${token}`
             },
-            body: JSON.stringify({ Points: finalScore }) // Capital 'P' for C# matching
+            body: JSON.stringify({ Points: finalScore }) 
         });
 
         if (response.ok) {
             console.log("Score successfully synced to the Cloud!");
         } else {
-            console.error("Server rejected the score. Check if you're still logged in.");
+            console.error("Server rejected the score.");
         }
     } 
     catch (err) 
     {
-        console.error("Render sync failed. Is your internet connected?", err);
+        console.error("Render sync failed.", err);
     }
 }
