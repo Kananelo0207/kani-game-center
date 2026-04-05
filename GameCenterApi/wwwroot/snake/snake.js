@@ -284,6 +284,7 @@ const cols = 25;
 let cell = canvas.width / cols;
 
 let gameRunning = false;
+let isMultiplayerMode = false;
 let phase = "idle";
 let names = ["Player 1", "Player 2"];
 let scores = [0, 0];
@@ -610,22 +611,35 @@ function showResults(p1, p2)
   });
 }
 
-async function runGame() 
+async function runGame(mode) // 1. Added 'mode' as a parameter
 {
   if (gameRunning) return;
   
-  // We know these exist because the bouncer checked them
   const p1 = localStorage.getItem("playerName");
-  
-  const p2 = (prompt("Enter name for Player 2 (optional):", "Guest") || "Guest").trim();
-
   gameRunning = true;
-  names = [p1, p2];
 
-  await runTurn(p1, true);
-  await runTurn(p2, false);
+  if (mode === "multi") {
+    // --- MULTIPLAYER PATH ---
+    const p2 = (prompt("Enter name for Player 2 (optional):", "Guest") || "Guest").trim();
+    names = [p1, p2];
 
-  showResults(p1, p2);
+    await runTurn(p1, true);
+    await runTurn(p2, false);
+
+    showResults(p1, p2);
+  } else {
+    // --- SINGLE PLAYER PATH ---
+    names = [p1];
+    
+    await runTurn(p1, true); 
+    
+    // NOTE: Because your runTurn function already has the code:
+    // "if (name === savedPlayer && token) { await submitSnakeScore(...) }"
+    // It will automatically sync your score to Render right here!
+    
+    showOverlay("GAME OVER - CHECK THE LEADERBOARD!");
+  }
+
   gameRunning = false;
 }
 
