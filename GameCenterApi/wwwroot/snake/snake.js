@@ -757,21 +757,26 @@ resetAll();
 
 async function submitSnakeScore(finalScore) {
     const token = localStorage.getItem('jwt_token');
+    
     try 
     {
-        await fetch('/api/game/submit-score', {
+        const response = await fetch('https://kani-game-center-api.onrender.com/api/game/submit-score', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
                 'Authorization': `Bearer ${token}`
             },
-            body: JSON.stringify({ points: finalScore })
+            body: JSON.stringify({ Points: finalScore }) // Capital 'P' for C# matching
         });
-        console.log("Snake score synced to the Render!");
 
+        if (response.ok) {
+            console.log("Score successfully synced to the Cloud!");
+        } else {
+            console.error("Server rejected the score. Check if you're still logged in.");
+        }
     } 
     catch (err) 
     {
-        console.error("Render sync failed:", err);
+        console.error("Render sync failed. Is your internet connected?", err);
     }
 }
