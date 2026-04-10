@@ -271,14 +271,14 @@
 
     if (mode === "ranked") {
         setStatus(`GAME OVER! Final Score: ${pScore}`, "pulse");
-        setLog(`💀 SURVIVAL FAILED\nFinal Score: ${pScore}\n\n<a href="../leaderboard.html" style="color: #a78bfa;">Check Global Rank</a>`, "pulse");
+        setLog(`SURVIVAL FAILED\nFinal Score: ${pScore}\n\n<a href="../leaderboard.html" style="color: #a78bfa;">Check Global Rank</a>`, "pulse");
         
         if (player1Name === localStorage.getItem("playerName")) {
             submitKnockoutScore(pScore);
         }
     } else {
         setStatus(`${champ} wins the MATCH!`, "pulse");
-        setLog(`🏁 Match over!\nWinner: ${champ}\nFinal: ${pScore} - ${cScore}\n\nPress Reset to play again.`, "pulse");
+        setLog(`Match over!\nWinner: ${champ}\nFinal: ${pScore} - ${cScore}\n\nPress Reset to play again.`, "pulse");
     }
   }
 

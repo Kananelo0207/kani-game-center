@@ -209,7 +209,7 @@
                         const row = document.createElement('tr');
                         
                         let rankDisplay = `#${index + 1}`;
-                        if (index === 0) rankDisplay = '👑 1';
+                        if (index === 0) rankDisplay = '1';
 
                         // FIX 2: Added fallback in case the API sends 'TotalPoints' vs 'totalPoints'
                         const name = player.playerName || player.PlayerName || "Unknown";
