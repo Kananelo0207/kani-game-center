@@ -237,6 +237,7 @@
   function endGame(winnerName){
     gameOver = true;
     setStatus(`Game Over — Winner: ${winnerName}`);
+    logEl.innerHTML = `<a href="../leaderboard.html" style="color: #a78bfa; text-decoration: underline; font-weight: bold;">Check your Global Rank here!</a>\n` + logEl.innerHTML;
     addHistory({
       winner: winnerName,
       mode: mode.toUpperCase(),
@@ -247,8 +248,8 @@
       p2: p2.score
     });
 
-    if (p1.name === localStorage.getItem("playerName")) {
-        console.log("Syncing Hangman score...");
+   if (mode === "ranked" && p1.name === localStorage.getItem("playerName")) {
+        setStatus(`Game Over. Syncing score of ${p1.score}...`);
         submitHangmanScore(p1.score);
     }
   }
