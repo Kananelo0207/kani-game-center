@@ -1,3 +1,8 @@
+// THE GATEKEEPER - Ensure player is authenticated
+const token = localStorage.getItem("jwt_token");
+const playerNameAuth = localStorage.getItem("playerName");
+if (!token || !playerNameAuth) window.location.href = "../signin.html";
+
 const canvas = document.getElementById("game");
 const ctx = canvas.getContext("2d");
 
@@ -5,6 +10,7 @@ const player1Input = document.getElementById("player1Name");
 const player2Input = document.getElementById("player2Name");
 const gameModeSelect = document.getElementById("gameMode");
 const roundSelector = document.getElementById("roundSelector");
+const targetContainer = document.getElementById("targetContainer");
 const startBtn = document.getElementById("startBtn");
 const restartBtn = document.getElementById("restartBtn");
 const winnerMessage = document.getElementById("winnerMessage");
@@ -23,9 +29,9 @@ const BASE_PLAYER_X = 20;
 const BASE_BALL_RADIUS = 8;
 const BASE_BALL_SPEED_X = 4;
 const BASE_BALL_SPEED_Y = 2.2;
-const BASE_MAX_SPEED_X = 7;
-const BASE_MAX_SPEED_Y = 5;
-const SPEED_INCREASE = 1.02;
+const BASE_MAX_SPEED_X = 14; // Increased cap for Endless Rally
+const BASE_MAX_SPEED_Y = 10;
+const SPEED_INCREASE = 1.05; // Slightly faster scaling
 
 let scale = 1;
 
@@ -44,7 +50,7 @@ let maxSpeedY = BASE_MAX_SPEED_Y;
 
 let player1Name = "Player 1";
 let player2Name = "Computer";
-let gameMode = "single";
+let gameMode = "ranked";
 let winningScore = 5;
 
 let playerY = 0;
@@ -55,7 +61,7 @@ let ballY = 0;
 let ballSpeedX = 0;
 let ballSpeedY = 0;
 
-let player1Score = 0;
+let player1Score = 0; // Acts as the Rally Streak in Ranked Mode
 let player2Score = 0;
 let gameOver = false;
 let gameStarted = false;
@@ -87,7 +93,7 @@ function resizeCanvas() {
   ballRadius = BASE_BALL_RADIUS * scale;
   baseBallSpeedX = BASE_BALL_SPEED_X * scale;
   baseBallSpeedY = BASE_BALL_SPEED_Y * scale;
-  maxSpeedX = (window.innerWidth <= 768 ? 6.2 : BASE_MAX_SPEED_X) * scale;
+  maxSpeedX = (window.innerWidth <= 768 ? 8 : BASE_MAX_SPEED_X) * scale;
   maxSpeedY = BASE_MAX_SPEED_Y * scale;
 
   playerX = BASE_PLAYER_X * scale;
@@ -124,7 +130,8 @@ function restartGame() {
   playerY = canvas.height / 2 - paddleHeight / 2;
   opponentY = canvas.height / 2 - paddleHeight / 2;
 
-  resetBall(Math.random() > 0.5 ? 1 : -1);
+  // In ranked mode, always serve towards the player
+  resetBall(gameMode === "ranked" ? -1 : (Math.random() > 0.5 ? 1 : -1));
 }
 
 function startGame() 
@@ -140,15 +147,29 @@ function startGame()
   gameMode = gameModeSelect.value;
   winningScore = Number(roundSelector.value);
 
-  if (gameMode === "single") 
+  if (gameMode === "ranked") {
+    player2Name = "Wall";
+    player2Input.style.display = "none";
+    roundSelector.style.display = "none";
+    targetContainer.style.display = "none";
+    controlsInfo.textContent = "Ranked: Keep the rally alive!";
+    modeLabel.textContent = "Endless Rally (Global)";
+  }
+  else if (gameMode === "single") 
   {
     player2Name = player2Input.value.trim() || "Computer";
+    player2Input.style.display = "inline-block";
+    roundSelector.style.display = "inline-block";
+    targetContainer.style.display = "inline";
     controlsInfo.textContent = "Controls: Mouse / touch drag";
     modeLabel.textContent = "Single Player";
   } 
   else 
   {
     player2Name = player2Input.value.trim() || "Player 2";
+    player2Input.style.display = "inline-block";
+    roundSelector.style.display = "inline-block";
+    targetContainer.style.display = "inline";
     controlsInfo.textContent = "Controls: Player 1 = W/S, Player 2 = ↑/↓";
     modeLabel.textContent = "Multiplayer";
   }
@@ -170,6 +191,11 @@ function drawPaddle(x, y) {
   ctx.fillRect(x, y, paddleWidth, paddleHeight);
 }
 
+function drawWall() {
+  ctx.fillStyle = "rgba(139, 92, 246, 0.4)";
+  ctx.fillRect(canvas.width - 15 * scale, 0, 15 * scale, canvas.height);
+}
+
 function drawBall() {
   ctx.fillStyle = "#ffffff";
   ctx.beginPath();
@@ -180,11 +206,17 @@ function drawBall() {
 function drawScore() {
   ctx.fillStyle = "#ffffff";
   ctx.font = `${Math.max(16, 20 * scale)}px Arial`;
-  ctx.textAlign = "left";
-  ctx.fillText(`${shortenName(player1Name)}: ${player1Score}`, 20 * scale, 30 * scale);
+  
+  if (gameMode === "ranked") {
+    ctx.textAlign = "center";
+    ctx.fillText(`Rally Streak: ${player1Score}`, canvas.width / 2, 30 * scale);
+  } else {
+    ctx.textAlign = "left";
+    ctx.fillText(`${shortenName(player1Name)}: ${player1Score}`, 20 * scale, 30 * scale);
 
-  ctx.textAlign = "right";
-  ctx.fillText(`${shortenName(player2Name)}: ${player2Score}`, canvas.width - 20 * scale, 30 * scale);
+    ctx.textAlign = "right";
+    ctx.fillText(`${shortenName(player2Name)}: ${player2Score}`, canvas.width - 20 * scale, 30 * scale);
+  }
 
   ctx.textAlign = "left";
 }
@@ -194,8 +226,7 @@ function drawStartMessage() {
     ctx.fillStyle = "#ffffff";
     ctx.font = `bold ${Math.max(18, 24 * scale)}px Arial`;
     ctx.textAlign = "center";
-    ctx.fillText("Set names, mode and rounds", canvas.width / 2, canvas.height / 2 - 18 * scale);
-    ctx.fillText("then press Start Game", canvas.width / 2, canvas.height / 2 + 18 * scale);
+    ctx.fillText("Set mode and press Start Game", canvas.width / 2, canvas.height / 2);
     ctx.textAlign = "left";
   }
 }
@@ -234,6 +265,18 @@ function handleWallCollision() {
     ballY = canvas.height - ballRadius;
     ballSpeedY *= -1;
   }
+
+  // RANKED MODE ONLY: Bounce off the solid right wall
+  if (gameMode === "ranked") {
+    if (ballX + ballRadius >= canvas.width - 15 * scale) {
+      ballX = canvas.width - 15 * scale - ballRadius;
+      ballSpeedX *= -1;
+      
+      // Add slight vertical randomness to prevent infinite straight loops
+      ballSpeedY += (Math.random() - 0.5) * 2;
+      capSpeed();
+    }
+  }
 }
 
 function handlePaddleCollision() {
@@ -244,7 +287,9 @@ function handlePaddleCollision() {
     ballY <= playerY + paddleHeight &&
     ballSpeedX < 0;
 
+  // The opponent paddle only exists in non-ranked modes
   const hitOpponent =
+    gameMode !== "ranked" &&
     ballX + ballRadius >= opponentX &&
     ballX + ballRadius <= opponentX + paddleWidth &&
     ballY >= opponentY &&
@@ -257,6 +302,11 @@ function handlePaddleCollision() {
     ballSpeedX = Math.abs(ballSpeedX) * SPEED_INCREASE;
     ballSpeedY += impact * 1.1 * scale;
     capSpeed();
+
+    // Give a point every time the player keeps the rally alive
+    if (gameMode === "ranked") {
+        player1Score++;
+    }
   }
 
   if (hitOpponent) {
@@ -269,35 +319,40 @@ function handlePaddleCollision() {
 }
 
 function handleScoring() {
+  // Left side boundary (Player missed)
   if (ballX + ballRadius < 0) {
+    
+    // Ranked Mode Death
+    if (gameMode === "ranked") {
+        gameOver = true;
+        winnerMessage.textContent = `Game Over!\nFinal Rally Streak: ${player1Score}`;
+        
+        if (player1Name === localStorage.getItem("playerName")) {
+            console.log("Match Over. Syncing HitBack points...");
+            submitHitBackScore(player1Score);
+        }
+        return;
+    }
+
+    // Normal Mode Scoring
     player2Score++;
 
     if (player2Score >= winningScore) {
       gameOver = true;
       winnerMessage.textContent = `${player2Name} Wins!`;
-      
-      if (player1Name === localStorage.getItem("playerName")) {
-          console.log("Match Over. Syncing HitBack points...");
-          submitHitBackScore(player1Score);
-      }
       return;
     }
 
     resetBall(1);
   }
 
-  if (ballX - ballRadius > canvas.width) {
+  // Right side boundary (Opponent missed - only happens in normal modes)
+  if (ballX - ballRadius > canvas.width && gameMode !== "ranked") {
     player1Score++;
 
     if (player1Score >= winningScore) {
       gameOver = true;
       winnerMessage.textContent = `${player1Name} Wins!`;
-      
-      // SYNC TRIGGER: Game Over (Player 1 won)
-      if (player1Name === localStorage.getItem("playerName")) {
-          console.log("Match Over. Syncing HitBack points...");
-          submitHitBackScore(player1Score);
-      }
       return;
     }
 
@@ -323,7 +378,13 @@ function draw() {
 
   drawCenterLine();
   drawPaddle(playerX, playerY);
-  drawPaddle(opponentX, opponentY);
+
+  if (gameMode === "ranked") {
+    drawWall();
+  } else {
+    drawPaddle(opponentX, opponentY);
+  }
+
   drawBall();
 
   if (gameStarted) {
@@ -337,9 +398,9 @@ function gameLoop() {
   draw();
 
   if (gameStarted && !gameOver) {
-    if (gameMode === "single") {
+    if (gameMode === "single" || gameMode === "ranked") {
       updateMobileSinglePlayer();
-      updateAI();
+      if (gameMode === "single") updateAI();
     } else {
       updateMultiplayer();
     }
@@ -359,18 +420,18 @@ function movePlayerFromPointer(clientY) {
 }
 
 document.addEventListener("mousemove", (e) => {
-  if (!gameStarted || gameOver || gameMode !== "single") return;
+  if (!gameStarted || gameOver || gameMode === "multi") return;
   movePlayerFromPointer(e.clientY);
 });
 
 canvas.addEventListener("touchstart", (e) => {
-  if (gameMode !== "single") return;
+  if (gameMode === "multi") return;
   movePlayerFromPointer(e.changedTouches[0].clientY);
   if (!gameStarted) startGame();
 }, { passive: true });
 
 canvas.addEventListener("touchmove", (e) => {
-  if (gameMode !== "single") return;
+  if (gameMode === "multi") return;
   movePlayerFromPointer(e.changedTouches[0].clientY);
 }, { passive: true });
 
@@ -409,14 +470,20 @@ document.addEventListener("keyup", (e) => {
 });
 
 gameModeSelect.addEventListener("change", () => {
-  if (gameModeSelect.value === "single") {
+  if (gameModeSelect.value === "ranked") {
+    player2Input.style.display = "none";
+    roundSelector.style.display = "none";
+    targetContainer.style.display = "none";
+  } else if (gameModeSelect.value === "single") {
     player2Input.placeholder = "Player 2 / Computer name";
-    controlsInfo.textContent = "Controls: Mouse / touch drag";
-    modeLabel.textContent = "Single Player";
+    player2Input.style.display = "inline-block";
+    roundSelector.style.display = "inline-block";
+    targetContainer.style.display = "inline";
   } else {
     player2Input.placeholder = "Player 2 name";
-    controlsInfo.textContent = "Controls: Player 1 = W/S, Player 2 = ↑/↓";
-    modeLabel.textContent = "Multiplayer";
+    player2Input.style.display = "inline-block";
+    roundSelector.style.display = "inline-block";
+    targetContainer.style.display = "inline";
   }
 });
 
@@ -428,10 +495,16 @@ restartBtn.addEventListener("click", () => {
 
 window.addEventListener("resize", resizeCanvas);
 
+// Init
+gameModeSelect.value = "ranked";
+player2Input.style.display = "none";
+roundSelector.style.display = "none";
+
 resizeCanvas();
 draw();
 gameLoop();
 
+// CLOUD SYNC FUNCTION
 async function submitHitBackScore(finalScore) {
     const token = localStorage.getItem('jwt_token');
     if (!token) return; 
@@ -443,9 +516,9 @@ async function submitHitBackScore(finalScore) {
                 'Content-Type': 'application/json',
                 'Authorization': `Bearer ${token}`
             },
-            body: JSON.stringify({ points: finalScore })
+            body: JSON.stringify({ Points: finalScore }) // Using 'Points' to match your C# backend requirements
         });
-        console.log("HitBack score synced to the Render!");
+        console.log("HitBack score synced to the Render API!");
     } catch (err) {
         console.error("HitBack API Sync failed:", err);
     }
