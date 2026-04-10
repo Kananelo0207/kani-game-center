@@ -1,3 +1,8 @@
+// THE GATEKEEPER - Ensure player is authenticated
+const token = localStorage.getItem("jwt_token");
+const playerName = localStorage.getItem("playerName");
+if (!token || !playerName) window.location.href = "../signin.html";
+
 const canvas = document.getElementById("game");
 const ctx = canvas.getContext("2d");
 const scoreEl = document.getElementById("scoreLabel");
@@ -7,10 +12,7 @@ const overlay = document.getElementById("overlay");
 const overlayText = document.getElementById("overlayText");
 const startBtn = document.getElementById("startBtn");
 
-const playerName = localStorage.getItem("playerName") || "Kani";
-
 async function submitPacManScore(finalScore) {
-    const token = localStorage.getItem('jwt_token');
     if (!token) return; 
 
     try {
@@ -20,9 +22,10 @@ async function submitPacManScore(finalScore) {
                 'Content-Type': 'application/json',
                 'Authorization': `Bearer ${token}`
             },
-            body: JSON.stringify({ points: finalScore })
+            // FIX: Capital P required by C# backend
+            body: JSON.stringify({ Points: finalScore })
         });
-        console.log("Pac-Man score synced to the Render!");
+        console.log("Pac-Man score synced to the Render API!");
     } catch (err) {
         console.error("Pac-Man API Sync failed:", err);
     }
@@ -384,7 +387,7 @@ function nextLevel() {
   if (currentLevel >= LEVELS.length) {
     gameWon = true;
     syncOverlayState();
-    submitPacManScore(score);
+    submitPacManScore(score); // Sync Score when game is fully beaten
     return;
   }
 
@@ -754,7 +757,7 @@ function checkGhostCollision() {
         } 
         else {
           syncOverlayState();
-          submitPacManScore(score);
+          submitPacManScore(score); // Sync Score on Death
         }
       }
       return;
