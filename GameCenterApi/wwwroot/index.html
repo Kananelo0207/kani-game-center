@@ -64,6 +64,20 @@
       </div>
     </header>
 
+    <section style="width: 100%; max-width: 1000px; margin: 0 auto 30px auto; display: flex; justify-content: space-between; align-items: center; background: rgba(30, 41, 59, 0.7); backdrop-filter: blur(12px); border: 1px solid rgba(139, 92, 246, 0.3); border-radius: 16px; padding: 20px 30px; box-shadow: 0 10px 30px rgba(0,0,0,0.3); flex-wrap: wrap; gap: 15px;">
+        <div>
+            <h2 style="margin: 0; color: #f8fafc; font-size: 1.5rem; font-family: 'Segoe UI', sans-serif;">
+                👑 Reigning Champion: <span id="topPlayerName" style="color: #fbbf24;">Loading API...</span>
+            </h2>
+            <p style="margin: 5px 0 0 0; color: #94a3b8; font-size: 0.95rem;">
+                Total Career Points: <span id="topPlayerScore" style="color: #10b981; font-weight: bold;">--</span>
+            </p>
+        </div>
+        <a href="leaderboard.html" style="background: linear-gradient(135deg, #8b5cf6, #c084fc); color: white; padding: 14px 28px; border-radius: 10px; text-decoration: none; font-weight: bold; transition: all 0.2s; white-space: nowrap; border: none; box-shadow: 0 4px 15px rgba(139, 92, 246, 0.4);">
+            🏆 View Global Top 200
+        </a>
+    </section>
+
     <section class="games">
       <article class="game-card">
         <div class="game-top knockout-bg">
@@ -132,16 +146,44 @@
     verifyToken();
 
     async function verifyToken() {
-    try {
-        // THE FIX: Full Render URL instead of just '/api/game/me'
-        const response = await fetch('https://kani-game-center-api.onrender.com/api/game/me', {
-            headers: { 'Authorization': `Bearer ${token}` }
-        });
-        if (!response.ok) logout();
-    } catch (err) {
-        console.error("Auth server offline, staying in local mode.");
+        try {
+            // THE FIX: Full Render URL instead of just '/api/game/me'
+            const response = await fetch('https://kani-game-center-api.onrender.com/api/game/me', {
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+            if (!response.ok) logout();
+        } catch (err) {
+            console.error("Auth server offline, staying in local mode.");
+        }
     }
+
+    // NEW: Fetch Top Player Logic
+    async function fetchTopPlayer() {
+        try {
+            const response = await fetch('https://kani-game-center-api.onrender.com/api/game/leaderboard');
+            if (response.ok) {
+                const data = await response.json();
+                if (data && data.length > 0) {
+                    const topPlayer = data[0]; // Gets the #1 spot
+                    
+                    const name = topPlayer.playerName || topPlayer.PlayerName || "Unknown";
+                    const points = topPlayer.totalPoints !== undefined ? topPlayer.totalPoints : (topPlayer.TotalPoints || 0);
+
+                    document.getElementById('topPlayerName').textContent = name;
+                    document.getElementById('topPlayerScore').textContent = points.toLocaleString();
+                } else {
+                    document.getElementById('topPlayerName').textContent = "No Champions Yet";
+                    document.getElementById('topPlayerScore').textContent = "0";
+                }
+            }
+        } catch (error) {
+            console.error("Could not fetch top player:", error);
+            document.getElementById('topPlayerName').textContent = "Server Offline";
+        }
     }
+
+    // Run the fetch when the page loads
+    fetchTopPlayer();
 
     function logout() {
       localStorage.clear(); 
