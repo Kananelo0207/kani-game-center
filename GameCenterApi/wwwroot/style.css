@@ -222,11 +222,7 @@ body
 
 .pandemic-bg 
 {
-  background: 
-    linear-gradient(rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.8)), 
-    url('pandemic/virus.jpg');
-  background-size: cover;
-  background-position: center;
+  background: linear-gradient(135deg, #004040, #000000);
   border: 1px solid #ff4444;
 }
 
