@@ -1,0 +1,170 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <link rel="stylesheet" href="../background.css">
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Pop-Up Pandemic</title>
+  <link rel="stylesheet" href="../style.css" />
+  <style>
+    /* Retro OS Desktop Environment */
+    .os-desktop {
+      position: relative;
+      width: min(800px, 96vw);
+      height: 600px;
+      background-color: #008080; /* Classic Win95 Teal */
+      border: 4px solid #dfdfdf;
+      border-radius: 8px;
+      overflow: hidden;
+      margin: 0 auto;
+      box-shadow: inset 2px 2px 5px rgba(0,0,0,0.5);
+    }
+
+    .os-taskbar {
+      position: absolute;
+      bottom: 0;
+      width: 100%;
+      height: 40px;
+      background: #c0c0c0;
+      border-top: 2px solid #ffffff;
+      display: flex;
+      align-items: center;
+      padding: 0 10px;
+      box-shadow: inset -1px -1px #0a0a0a;
+      z-index: 1000;
+    }
+
+    .start-btn {
+      background: #c0c0c0;
+      border: 2px solid;
+      border-color: #ffffff #000000 #000000 #ffffff;
+      padding: 4px 10px;
+      font-weight: bold;
+      color: black;
+      cursor: pointer;
+    }
+
+    .start-btn:active {
+      border-color: #000000 #ffffff #ffffff #000000;
+    }
+
+    /* The Pop-Up Window */
+    .popup-window {
+      position: absolute;
+      width: 250px;
+      background: #c0c0c0;
+      border: 2px solid;
+      border-color: #ffffff #0a0a0a #0a0a0a #ffffff;
+      box-shadow: 2px 2px 5px rgba(0,0,0,0.3);
+      z-index: 10;
+      color: black;
+      font-family: 'Courier New', Courier, monospace;
+    }
+
+    .title-bar {
+      background: #000080;
+      color: white;
+      padding: 3px 5px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-weight: bold;
+      font-size: 14px;
+    }
+
+    .close-btn {
+      background: #c0c0c0;
+      border: 1px solid;
+      border-color: #ffffff #000000 #000000 #ffffff;
+      color: black;
+      font-weight: bold;
+      width: 20px;
+      height: 20px;
+      cursor: pointer;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .close-btn:disabled {
+      color: #888;
+      cursor: not-allowed;
+    }
+
+    .window-content {
+      padding: 15px;
+      text-align: center;
+      font-size: 14px;
+    }
+
+    .micro-input {
+      width: 90%;
+      margin-top: 10px;
+      padding: 4px;
+      border: 2px inset #ffffff;
+    }
+
+    /* Game Over Overlay */
+    #overlay {
+      position: absolute;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.85);
+      z-index: 2000;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      color: #00ff00;
+      font-family: monospace;
+      text-align: center;
+    }
+
+    #overlay button {
+      margin-top: 20px;
+      padding: 10px 20px;
+      font-size: 16px;
+      background: #00ff00;
+      color: black;
+      border: none;
+      cursor: pointer;
+      font-weight: bold;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="bg" aria-hidden="true">
+    <div class="blob b1"></div>
+    <div class="blob b2"></div>
+    <div class="blob b3"></div>
+  </div>
+
+  <main class="wrap">
+    <header class="pagehead" style="text-align: center;">
+      <h1>Pop-Up Pandemic 💻</h1>
+      <p style="color: white; font-weight: bold;">Score: <span id="scoreLabel">0</span> | CPU Load: <span id="loadLabel">0</span>/10</p>
+      
+      <div style="margin-bottom: 20px;">
+        <a class="btn ghost" href="../index.html" style="color: white;">← Back to Hub</a>
+      </div>
+    </header>
+
+    <section class="stage">
+      <div id="desktop" class="os-desktop">
+        <div id="overlay">
+          <h2 id="overlayText">SYSTEM READY</h2>
+          <p>Close windows before CPU reaches 10/10.</p>
+          <button id="startBtn" type="button">BOOT SYSTEM</button>
+        </div>
+
+        <div class="os-taskbar">
+          <button class="start-btn">Start</button>
+          <span style="margin-left: auto; color: black; font-family: monospace; font-weight: bold;" id="timeLabel">12:00 PM</span>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <script src="script.js"></script>
+</body>
+</html>
