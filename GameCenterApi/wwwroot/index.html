@@ -33,7 +33,6 @@
   </style>
 
   <script>
-    // THE GATEKEEPER: Runs instantly before the page even paints
     if (!localStorage.getItem("jwt_token") || !localStorage.getItem("playerName")) {
         window.location.href = "signin.html";
     }
@@ -121,13 +120,12 @@
       <article class="game-card">
         <div class="game-card pandemic-bg">
           <div class="game-top">
-            <img src="pandemic/virus.jpg" class="game-cover" alt="Virus Core">
-            <span class="tag" style="background: #ff0000; border-color: #ffaa00;"> BRAND NEW</span>
+            <img src="images/virus.jpg" class="game-cover" alt="Virus Core">
             <h2>Pop-Up Pandemic</h2>
             <p>A frantic UI survival game. Close the pop-ups before your system overloads. Do not panic.</p>
           </div>
           <div class="game-bottom">
-            <a href="pandemic/index.html" class="play-btn">Play Now</a>
+            <a href="pandemic/index.html" class="play-btn">Play</a>
           </div>
         </div>
       </article>
@@ -160,7 +158,7 @@
       const token = localStorage.getItem("jwt_token");
       const playerName = localStorage.getItem("playerName");
       
-      document.getElementById("welcomePlayer").textContent = `Welcome back, ${playerName}! 🎮`;
+      document.getElementById("welcomePlayer").textContent = `Welcome back, ${playerName}! `;
       
       verifyToken();
 
