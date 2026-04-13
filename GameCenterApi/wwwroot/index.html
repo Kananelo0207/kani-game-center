@@ -142,91 +142,95 @@
     </section>
   </main>
 
-  <script>
-    const token = localStorage.getItem("jwt_token");
-    const playerName = localStorage.getItem("playerName");
-    
-    // Set the welcome text since they passed the gatekeeper
-    document.getElementById("welcomePlayer").textContent = `Welcome back, ${playerName}! `;
-    
-    verifyToken();
+   <script>
+      const token = localStorage.getItem("jwt_token");
+      const playerName = localStorage.getItem("playerName");
+      
+      document.getElementById("welcomePlayer").textContent = `Welcome back, ${playerName}! 🎮`;
+      
+      verifyToken();
 
-    async function verifyToken() {
-        try {
-            // THE FIX: Full Render URL instead of just '/api/game/me'
-            const response = await fetch('https://kani-game-center-api.onrender.com/api/game/me', {
-                headers: { 'Authorization': `Bearer ${token}` }
-            });
-            if (!response.ok) logout();
-        } catch (err) {
-            console.error("Auth server offline, staying in local mode.");
-        }
-    }
+      async function verifyToken() {
+          try {
+              const response = await fetch('https://kani-game-center-api.onrender.com/api/game/me', {
+                  headers: { 'Authorization': `Bearer ${token}` }
+              });
+              if (!response.ok) logout();
+          } catch (err) {
+              console.error("Auth server offline, staying in local mode.");
+          }
+      }
 
-    async function fetchTopPlayer() {
-        try {
-            const response = await fetch('https://kani-game-center-api.onrender.com/api/game/leaderboard');
-            if (response.ok) {
-                const data = await response.json();
-                if (data && data.length > 0) {
-                    const topPlayer = data[0]; // Gets the #1 spot
-                    
-                    const name = topPlayer.playerName || topPlayer.PlayerName || "Unknown";
-                    const points = topPlayer.totalPoints !== undefined ? topPlayer.totalPoints : (topPlayer.TotalPoints || 0);
+      async function fetchTopPlayer() {
+          try {
+              const response = await fetch('https://kani-game-center-api.onrender.com/api/game/leaderboard');
+              if (response.ok) {
+                  const data = await response.json();
+                  if (data && data.length > 0) {
+                      const topPlayer = data[0]; 
+                      
+                      const name = topPlayer.playerName || topPlayer.PlayerName || "Unknown";
+                      const points = topPlayer.totalPoints !== undefined ? topPlayer.totalPoints : (topPlayer.TotalPoints || 0);
 
-                    document.getElementById('topPlayerName').textContent = name;
-                    document.getElementById('topPlayerScore').textContent = points.toLocaleString();
-                } else {
-                    document.getElementById('topPlayerName').textContent = "No Champions Yet";
-                    document.getElementById('topPlayerScore').textContent = "0";
-                }
-            }
-        } catch (error) {
-            console.error("Could not fetch top player:", error);
-            document.getElementById('topPlayerName').textContent = "Server Offline";
-        }
-    }
+                      document.getElementById('topPlayerName').textContent = name;
+                      document.getElementById('topPlayerScore').textContent = points.toLocaleString();
+                  } else {
+                      document.getElementById('topPlayerName').textContent = "No Champions Yet";
+                      document.getElementById('topPlayerScore').textContent = "0";
+                  }
+              }
+          } catch (error) {
+              console.error("Could not fetch top player:", error);
+              document.getElementById('topPlayerName').textContent = "Server Offline";
+          }
+      }
 
-    fetchTopPlayer();
+      fetchTopPlayer();
 
-    function logout() {
-      localStorage.clear(); 
-      window.location.href = "signin.html";
-    }
+      function logout() {
+        localStorage.clear(); 
+        window.location.href = "signin.html";
+      }
 
-    function TrackMouseMovement(event) {
-      document.documentElement.style.setProperty("--mx", (event.clientX / window.innerWidth) * 100 + "%");
-      document.documentElement.style.setProperty("--my", (event.clientY / window.innerHeight) * 100 + "%");
-    }
-    document.addEventListener("mousemove", TrackMouseMovement);
+      function TrackMouseMovement(event) {
+        document.documentElement.style.setProperty("--mx", (event.clientX / window.innerWidth) * 100 + "%");
+        document.documentElement.style.setProperty("--my", (event.clientY / window.innerHeight) * 100 + "%");
+      }
+      document.addEventListener("mousemove", TrackMouseMovement);
 
-    let hubZoom = parseFloat(localStorage.getItem("hubZoom")) || 1.0;
+      let hubZoom = parseFloat(localStorage.getItem("hubZoom"));
 
-    window.addEventListener("DOMContentLoaded", () => {
-        applyZoom();
-    });
+      if (isNaN(hubZoom)) {
+          hubZoom = window.innerWidth < 768 ? 0.8 : 1.0; 
+      }
 
-    function applyZoom() {
-        const gameGrid = document.querySelector('.games');
-        if (gameGrid) {
-            gameGrid.style.transform = `scale(${hubZoom})`;
-            gameGrid.style.transformOrigin = "top center";
-            
-            gameGrid.style.marginBottom = hubZoom < 1 ? `-${(1 - hubZoom) * 100}%` : "0px";
-            
-            localStorage.setItem("hubZoom", hubZoom);
-        }
-    }
+      window.addEventListener("DOMContentLoaded", () => {
+          applyZoom();
+      });
 
-    function adjustZoom(amount) {
-        hubZoom = Math.min(Math.max(hubZoom + amount, 0.5), 1.2);
-        applyZoom();
-    }
+      function applyZoom() {
+          const gameGrid = document.querySelector('.games');
+          if (gameGrid) {
+              gameGrid.style.transform = `scale(${hubZoom})`;
+              gameGrid.style.transformOrigin = "top center";
+              
+              gameGrid.style.width = `${100 / hubZoom}%`;
+              
+              gameGrid.style.marginBottom = hubZoom < 1 ? `-${(1 - hubZoom) * 80}vh` : "0px";
+              
+              localStorage.setItem("hubZoom", hubZoom);
+          }
+      }
 
-    function resetZoom() {
-        hubZoom = 1.0;
-        applyZoom();
-    }
-  </script>
+      function adjustZoom(amount) {
+          hubZoom = Math.min(Math.max(hubZoom + amount, 0.4), 1.2);
+          applyZoom();
+      }
+
+      function resetZoom() {
+          hubZoom = window.innerWidth < 768 ? 0.8 : 1.0;
+          applyZoom();
+      }
+    </script>
 </body>
 </html>
