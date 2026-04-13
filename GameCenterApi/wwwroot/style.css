@@ -234,34 +234,71 @@ body
 
 @media (max-width: 700px)
 {
-  .wrap
+  .wrap 
   {
-    padding: 28px 14px 40px;
+    padding: 15px 10px; /* Reduced padding to save space */
   }
 
-  .games
+  /* Force 2 columns instead of 1 */
+  .games 
   {
-    grid-template-columns: 1fr;
+    grid-template-columns: repeat(2, 1fr); 
+    gap: 12px; /* Tighter gap */
   }
 
-  .game-card
+  .game-card 
   {
-    min-height: 300px;
+    min-height: auto; /* Allow cards to shrink to their content */
+    border-radius: 16px; /* Slightly smaller corners for smaller cards */
   }
 
-  .game-top
+  .game-top 
   {
-    min-height: 270px;
+    min-height: auto;
+    padding: 12px;
+    gap: 4px;
   }
 
-  .game-top h2
+  /* Shrink the images significantly */
+  .game-cover 
   {
-    font-size: 26px;
+    height: 100px; 
+    margin-bottom: 8px;
   }
 
-  .game-cover
+  /* Shrink text to fit 2-column layout */
+  .game-top h2 
   {
-    height: 150px;
+    font-size: 18px; 
+  }
+
+  .game-top p 
+  {
+    font-size: 12px;
+    line-height: 1.3;
+    /* Limit description to 2 lines to keep cards uniform */
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  .game-bottom 
+  {
+    padding: 10px 12px;
+  }
+
+  .play-btn 
+  {
+    font-size: 12px;
+    padding: 6px 12px;
+    width: 100%; /* Make button full width for easier tapping */
+    text-align: center;
+  }
+
+  /* Hide tags on mobile to declutter the small cards */
+  .tag {
+    display: none;
   }
 }
 
