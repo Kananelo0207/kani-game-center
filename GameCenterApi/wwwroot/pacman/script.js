@@ -22,7 +22,6 @@ async function submitPacManScore(finalScore) {
                 'Content-Type': 'application/json',
                 'Authorization': `Bearer ${token}`
             },
-            // FIX: Capital P required by C# backend
             body: JSON.stringify({ Points: finalScore })
         });
         console.log("Pac-Man score synced to the Render API!");
@@ -387,7 +386,7 @@ function nextLevel() {
   if (currentLevel >= LEVELS.length) {
     gameWon = true;
     syncOverlayState();
-    submitPacManScore(score); // Sync Score when game is fully beaten
+    submitPacManScore(score); 
     return;
   }
 
@@ -757,7 +756,7 @@ function checkGhostCollision() {
         } 
         else {
           syncOverlayState();
-          submitPacManScore(score); // Sync Score on Death
+          submitPacManScore(score); 
         }
       }
       return;

@@ -29,9 +29,9 @@ const BASE_PLAYER_X = 20;
 const BASE_BALL_RADIUS = 8;
 const BASE_BALL_SPEED_X = 4;
 const BASE_BALL_SPEED_Y = 2.2;
-const BASE_MAX_SPEED_X = 14; // Increased cap for Endless Rally
+const BASE_MAX_SPEED_X = 14; 
 const BASE_MAX_SPEED_Y = 10;
-const SPEED_INCREASE = 1.05; // Slightly faster scaling
+const SPEED_INCREASE = 1.05; 
 
 let scale = 1;
 
@@ -61,7 +61,7 @@ let ballY = 0;
 let ballSpeedX = 0;
 let ballSpeedY = 0;
 
-let player1Score = 0; // Acts as the Rally Streak in Ranked Mode
+let player1Score = 0; 
 let player2Score = 0;
 let gameOver = false;
 let gameStarted = false;
@@ -130,7 +130,6 @@ function restartGame() {
   playerY = canvas.height / 2 - paddleHeight / 2;
   opponentY = canvas.height / 2 - paddleHeight / 2;
 
-  // In ranked mode, always serve towards the player
   resetBall(gameMode === "ranked" ? -1 : (Math.random() > 0.5 ? 1 : -1));
 }
 
@@ -266,13 +265,11 @@ function handleWallCollision() {
     ballSpeedY *= -1;
   }
 
-  // RANKED MODE ONLY: Bounce off the solid right wall
   if (gameMode === "ranked") {
     if (ballX + ballRadius >= canvas.width - 15 * scale) {
       ballX = canvas.width - 15 * scale - ballRadius;
       ballSpeedX *= -1;
       
-      // Add slight vertical randomness to prevent infinite straight loops
       ballSpeedY += (Math.random() - 0.5) * 2;
       capSpeed();
     }
@@ -287,7 +284,6 @@ function handlePaddleCollision() {
     ballY <= playerY + paddleHeight &&
     ballSpeedX < 0;
 
-  // The opponent paddle only exists in non-ranked modes
   const hitOpponent =
     gameMode !== "ranked" &&
     ballX + ballRadius >= opponentX &&
@@ -303,7 +299,6 @@ function handlePaddleCollision() {
     ballSpeedY += impact * 1.1 * scale;
     capSpeed();
 
-    // Give a point every time the player keeps the rally alive
     if (gameMode === "ranked") {
         player1Score++;
     }
@@ -319,10 +314,8 @@ function handlePaddleCollision() {
 }
 
 function handleScoring() {
-  // Left side boundary (Player missed)
   if (ballX + ballRadius < 0) {
     
-    // Ranked Mode Death
     if (gameMode === "ranked") {
         gameOver = true;
         winnerMessage.textContent = `Game Over!\nFinal Rally Streak: ${player1Score}`;
@@ -334,7 +327,6 @@ function handleScoring() {
         return;
     }
 
-    // Normal Mode Scoring
     player2Score++;
 
     if (player2Score >= winningScore) {
@@ -346,7 +338,6 @@ function handleScoring() {
     resetBall(1);
   }
 
-  // Right side boundary (Opponent missed - only happens in normal modes)
   if (ballX - ballRadius > canvas.width && gameMode !== "ranked") {
     player1Score++;
 
@@ -504,7 +495,6 @@ resizeCanvas();
 draw();
 gameLoop();
 
-// CLOUD SYNC FUNCTION
 async function submitHitBackScore(finalScore) {
     const token = localStorage.getItem('jwt_token');
     if (!token) return; 
@@ -516,7 +506,7 @@ async function submitHitBackScore(finalScore) {
                 'Content-Type': 'application/json',
                 'Authorization': `Bearer ${token}`
             },
-            body: JSON.stringify({ Points: finalScore }) // Using 'Points' to match your C# backend requirements
+            body: JSON.stringify({ Points: finalScore }) 
         });
         console.log("HitBack score synced to the Render API!");
     } catch (err) {

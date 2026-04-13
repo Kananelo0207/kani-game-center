@@ -1,4 +1,3 @@
-// THE GATEKEEPER
 const token = localStorage.getItem("jwt_token");
 const playerName = localStorage.getItem("playerName");
 if (!token || !playerName) window.location.href = "../signin.html";
@@ -13,15 +12,13 @@ const startBtn = document.getElementById("startBtn");
 let score = 0;
 let activeWindows = 0;
 const MAX_WINDOWS = 10;
-let spawnRate = 2000; // Starts at 2 seconds
+let spawnRate = 2000; 
 let gameInterval;
 let difficultyInterval;
 let gameRunning = false;
 
-// Random Words for the Typing Micro-Game
 const words = ["DATA", "VIRUS", "WORM", "HACK", "CODE", "BYTE", "FILE", "NODE", "PORT", "PING"];
 
-// --- GLOBAL LEADERBOARD SYNC ---
 async function submitPandemicScore(finalScore) {
     if (!token) return; 
     try {
@@ -43,7 +40,6 @@ function updateHUD() {
     scoreLabel.textContent = score;
     loadLabel.textContent = activeWindows;
     
-    // Change color to red if danger is near
     if (activeWindows >= 8) {
         loadLabel.style.color = "red";
     } else {
@@ -56,7 +52,6 @@ function gameOver() {
     clearInterval(gameInterval);
     clearInterval(difficultyInterval);
     
-    // Clear all windows off the desktop
     const windows = document.querySelectorAll('.popup-window');
     windows.forEach(win => win.remove());
     
@@ -67,7 +62,6 @@ function gameOver() {
     submitPandemicScore(score);
 }
 
-// Function to handle a successfully closed window
 window.closeWindow = function(windowId) {
     if (!gameRunning) return;
     
@@ -80,17 +74,15 @@ window.closeWindow = function(windowId) {
     }
 }
 
-// Validation logic for the Typing Micro-game
 window.checkTyping = function(inputElement, targetWord, windowId, closeBtnId) {
     if (inputElement.value.toUpperCase() === targetWord) {
         document.getElementById(closeBtnId).disabled = false;
-        inputElement.style.backgroundColor = "#90ee90"; // Green for success
+        inputElement.style.backgroundColor = "#90ee90"; 
     } else {
         document.getElementById(closeBtnId).disabled = true;
     }
 }
 
-// Validation logic for the Slider Micro-game
 window.checkSlider = function(inputElement, windowId, closeBtnId) {
     if (inputElement.value == 100) {
         document.getElementById(closeBtnId).disabled = false;
@@ -113,52 +105,45 @@ function spawnWindow() {
     const windowId = `win_${Date.now()}_${Math.floor(Math.random() * 1000)}`;
     const closeBtnId = `btn_${windowId}`;
     
-    // Determine random position (keeping it inside the desktop bounds)
-    const maxX = desktop.clientWidth - 260; // 250px width + padding
-    const maxY = desktop.clientHeight - 180; // Buffer for taskbar and height
+    const maxX = desktop.clientWidth - 260; 
+    const maxY = desktop.clientHeight - 180; 
     const randomX = Math.max(0, Math.floor(Math.random() * maxX));
     const randomY = Math.max(0, Math.floor(Math.random() * maxY));
 
-    // Choose which micro-game this pop-up will be
     const gameType = Math.floor(Math.random() * 3);
     let title = "";
     let content = "";
     let closeDisabled = "";
 
     if (gameType === 0) {
-        // MICRO-GAME 1: Simple Click
         title = "Warning.exe";
         content = `<p>Your system is compromised. Click X to close immediately.</p>`;
-        closeDisabled = ""; // Unlocked by default
+        closeDisabled = ""; 
     } 
     else if (gameType === 1) {
-        // MICRO-GAME 2: The Typer
         const target = words[Math.floor(Math.random() * words.length)];
         title = "Security_Check";
         content = `
             <p>Type <strong>${target}</strong> to unlock the close button.</p>
             <input type="text" class="micro-input" oninput="checkTyping(this, '${target}', '${windowId}', '${closeBtnId}')" autocomplete="off" />
         `;
-        closeDisabled = "disabled"; // Locked
+        closeDisabled = "disabled"; 
     } 
     else if (gameType === 2) {
-        // MICRO-GAME 3: The Slider
         title = "System_Calibrate";
         content = `
             <p>Slide power to 100% to terminate process.</p>
             <input type="range" min="0" max="100" value="0" class="micro-input" oninput="checkSlider(this, '${windowId}', '${closeBtnId}')" />
         `;
-        closeDisabled = "disabled"; // Locked
+        closeDisabled = "disabled"; 
     }
 
-    // Build the actual HTML element
     const winDiv = document.createElement("div");
     winDiv.id = windowId;
     winDiv.className = "popup-window";
     winDiv.style.left = `${randomX}px`;
     winDiv.style.top = `${randomY}px`;
     
-    // Bring clicked windows to the front
     winDiv.onmousedown = () => {
         document.querySelectorAll('.popup-window').forEach(w => w.style.zIndex = 10);
         winDiv.style.zIndex = 20;
@@ -186,15 +171,12 @@ function startGame() {
     overlay.style.display = "none";
     updateHUD();
 
-    // Spawn the first window immediately
     spawnWindow();
 
-    // Start the game loop
     gameInterval = setInterval(spawnWindow, spawnRate);
 
-    // Make it harder over time (decrease spawn delay every 5 seconds)
     difficultyInterval = setInterval(() => {
-        if (spawnRate > 600) { // Cap maximum speed
+        if (spawnRate > 600) { 
             spawnRate -= 150;
             clearInterval(gameInterval);
             gameInterval = setInterval(spawnWindow, spawnRate);
@@ -204,7 +186,6 @@ function startGame() {
 
 startBtn.addEventListener("click", startGame);
 
-// Clock for the fake OS
 setInterval(() => {
     const now = new Date();
     document.getElementById("timeLabel").textContent = now.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});

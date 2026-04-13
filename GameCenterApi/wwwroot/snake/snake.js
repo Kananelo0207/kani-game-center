@@ -547,11 +547,9 @@ async function runTurn(name, startOnLeft)
   phase = "gameover";
   await delay(800);
   
-  // 1. Update your local leaderboard
   updateLB(name, snake.score);
   leaderboardEl.textContent = lbText();
 
-  // 2. The API Connection:
   const savedPlayer = localStorage.getItem("playerName");
   const token = localStorage.getItem("jwt_token");
 
@@ -602,10 +600,10 @@ async function runGame(mode) {
     if (mode === "single") {
         names = [p1];
         await runTurn(p1, true); 
-        // Resetting after single player
         await delay(1000);
         resetAll();
-    } else {
+    } 
+    else {
         const p2 = (prompt("Enter name for Player 2:", "Guest") || "Guest").trim();
         names = [p1, p2];
 

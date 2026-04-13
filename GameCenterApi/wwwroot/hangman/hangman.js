@@ -1,5 +1,4 @@
 (() => {
-  // --- AUTH CHECK ---
   const token = localStorage.getItem("jwt_token");
   const playerName = localStorage.getItem("playerName");
 
@@ -42,20 +41,24 @@
   const catSel  = document.getElementById("category");
   const newGameBtn = document.getElementById("newGameBtn");
   const resetHistoryBtn = document.getElementById("resetHistoryBtn");
+
   const hintBtn = document.getElementById("hintBtn");
   const hintEl = document.getElementById("hint");
   const p1Label = document.getElementById("p1Label");
   const p2Label = document.getElementById("p2Label");
   const p1ScoreEl = document.getElementById("p1Score");
+
   const p2ScoreEl = document.getElementById("p2Score");
   const livesEl = document.getElementById("lives");
   const statusEl = document.getElementById("status");
   const wordEl = document.getElementById("word");
   const usedEl = document.getElementById("usedLetters");
+
   const logEl = document.getElementById("log");
   const guessInput = document.getElementById("guessInput");
   const guessBtn = document.getElementById("guessBtn");
   const skipBtn = document.getElementById("skipBtn");
+
   const canvas = document.getElementById("hangCanvas");
   const ctx = canvas.getContext("2d");
   const flash = document.getElementById("flash");
@@ -198,7 +201,6 @@
     p2.name = (prompt("Enter Player 2 name:", "Player 2") || "").trim() || "Player 2";
   }
 
-  // --- NEW helper: Setup Board without resetting score (for Survival) ---
   function setupNextWord() {
     used = [];
     hintEl.hidden = true;
@@ -254,12 +256,10 @@
     }
   }
 
-  // --- UPDATED: 1 Point per letter logic ---
   function scoreCorrect(pl){ /* No points for individual letters anymore */ }
   function scoreWrong(pl){ /* No penalties for individual letters anymore */ }
   
   function scoreWinWord(pl){
-    // Filter out spaces to count only actual letters
     const letterCount = secret.replace(/\s/g, "").length;
     pl.score += letterCount;
   }
@@ -356,7 +356,6 @@
   function showHint(){
     if (gameOver) return;
     const pl = currentPlayer();
-    // Hint penalty is now 5 points since scoring is more valuable
     pl.score = Math.max(0, pl.score - 5);
     hintEl.hidden = false;
     hintEl.textContent = `HINT: ${hint}`;

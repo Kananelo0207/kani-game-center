@@ -55,7 +55,7 @@
   let pScore = 0;
   let cScore = 0;
   let rounds = 0;
-  let lives = 5; // NEW: Survival Lives
+  let lives = 5; 
 
   let p1Pick = null;
   let p2Pick = null;
@@ -68,7 +68,6 @@
 
   const cap = (s) => s.charAt(0).toUpperCase() + s.slice(1);
 
-  // COURIER: Sync scores to C# API
   async function submitKnockoutScore(finalScore) {
     if (!token) return;
     try {
@@ -78,7 +77,7 @@
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${token}`
         },
-        body: JSON.stringify({ Points: finalScore }) // Capital P for C# Backend
+        body: JSON.stringify({ Points: finalScore }) 
       });
       console.log("KnockoutClash score synced to Render!");
     } catch (err) {
@@ -107,7 +106,6 @@
     pScoreEl.textContent = String(pScore);
     roundsEl.textContent = String(rounds);
 
-    // If Ranked, show Lives instead of CPU Score
     if (mode === "ranked") {
         cScoreEl.textContent = String(lives);
     } else {
@@ -187,7 +185,6 @@
     cpuField.style.display = (mode === "cpu" || mode === "ranked") ? "" : "none";
     tipEl.style.display = mode === "pvp" ? "" : "none";
     
-    // Ranked UI adaptations
     if (mode === "ranked") {
         winConditionField.style.display = "none";
         hudLabelLeft.textContent = "Points";
@@ -214,7 +211,7 @@
     pScore = 0;
     cScore = 0;
     rounds = 0;
-    lives = 5; // Reset survival lives
+    lives = 5; 
     p1Pick = null;
     p2Pick = null;
     pvpTurn = 1;
@@ -300,7 +297,6 @@
     const winner = resolve(p1Pick, p2Pick);
     const p2Display = (mode === "cpu" || mode === "ranked") ? "CPU" : player2Name;
 
-    // SCORING LOGIC
     if (mode === "ranked") {
         if (winner === "draw") {
             setStatus("Draw! Lives intact.", "pulse");
@@ -320,8 +316,8 @@
             endMatch("Game Over");
             return;
         }
-    } else {
-        // Normal PvP / CPU Scoring
+    } 
+    else {
         if (winner === "draw") {
           setStatus("Draw!", "pulse");
           setLog(`${player1Name}: ${cap(p1Pick)}\n${p2Display}: ${cap(p2Pick)}\n\nResult: Draw.`, "pulse");
