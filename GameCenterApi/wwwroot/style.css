@@ -273,15 +273,13 @@ body
   }
 
   .game-top p 
-  {
-    font-size: 12px;
-    line-height: 1.3;
-    /* Limit description to 2 lines to keep cards uniform */
-    display: -webkit-box;
-    -webkit-line-clamp: 2;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
-  }
+{
+  font-size: 12px;
+  line-height: 1.3;
+  height: 2.6em; /* Exactly 2 lines of text */
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
 
   .game-bottom 
   {
