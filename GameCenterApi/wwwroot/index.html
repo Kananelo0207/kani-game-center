@@ -9,29 +9,6 @@
   <link rel="stylesheet" href="background.css"/>
   <link rel="stylesheet" href="style.css"/>
 
-  <style>
-    .signout-btn {
-      margin-top: 15px;
-      padding: 8px 20px;
-      background: rgba(255, 255, 255, 0.05);
-      border: 1px solid rgba(255, 255, 255, 0.2);
-      color: #b9c2d0;
-      border-radius: 10px;
-      cursor: pointer;
-      font-size: 14px;
-      transition: all 0.2s ease;
-      backdrop-filter: blur(5px);
-      text-decoration: none;
-    }
-
-    .signout-btn:hover {
-      background: rgba(254, 164, 175, 0.2);
-      border-color: #fda4af;
-      color: white;
-      transform: translateY(-2px);
-    }
-  </style>
-
   <script>
     if (!localStorage.getItem("jwt_token") || !localStorage.getItem("playerName")) {
         window.location.href = "signin.html";
@@ -56,12 +33,12 @@
         <p id="welcomePlayer" class="subtitle" style="text-align: center; font-weight: bold; color: white;">Loading...</p>
         <p class="subtitle" style="text-align: center;">Pick A Game And Jump In Player.</p>
 
-        <div style="text-align: center; display: flex; justify-content: center; gap: 15px; margin-bottom: 10px;">
+        <div class="hub-controls">
           <a href="leaderboard.html" class="signout-btn">Leaderboard</a>
           <button class="signout-btn" onclick="logout()">Sign Out</button>
         </div>
 
-        <div style="text-align: center; display: flex; justify-content: center; gap: 10px; margin-bottom: 20px;">
+        <div class="zoom-controls">
           <button class="signout-btn" onclick="adjustZoom(-0.1)" title="Zoom Out" style="min-width: 45px;">➖</button>
           <button class="signout-btn" onclick="resetZoom()" style="font-size: 12px;">Reset Zoom</button>
           <button class="signout-btn" onclick="adjustZoom(0.1)" title="Zoom In" style="min-width: 45px;">➕</button>
@@ -69,16 +46,16 @@
       </div>
     </header>
 
-    <section style="width: 100%; max-width: 1000px; margin: 0 auto 30px auto; display: flex; justify-content: space-between; align-items: center; background: rgba(30, 41, 59, 0.7); backdrop-filter: blur(12px); border: 1px solid rgba(139, 92, 246, 0.3); border-radius: 16px; padding: 20px 30px; box-shadow: 0 10px 30px rgba(0,0,0,0.3); flex-wrap: wrap; gap: 15px;">
+    <section class="champion-banner">
         <div>
-            <h2 style="margin: 0; color: #f8fafc; font-size: 1.5rem; font-family: 'Segoe UI', sans-serif;">
+            <h2>
                 Reigning Champion: <span id="topPlayerName" style="color: #fbbf24;">Loading API...</span>
             </h2>
-            <p style="margin: 5px 0 0 0; color: #94a3b8; font-size: 0.95rem;">
+            <p>
                 Total Career Points: <span id="topPlayerScore" style="color: #10b981; font-weight: bold;">--</span>
             </p>
         </div>
-        <a href="leaderboard.html" style="background: linear-gradient(135deg, #8b5cf6, #c084fc); color: white; padding: 14px 28px; border-radius: 10px; text-decoration: none; font-weight: bold; transition: all 0.2s; white-space: nowrap; border: none; box-shadow: 0 4px 15px rgba(139, 92, 246, 0.4);">
+        <a href="leaderboard.html" class="btn-view-global">
             View Global Top 200
         </a>
     </section>
@@ -180,7 +157,6 @@
                   const data = await response.json();
                   if (data && data.length > 0) {
                       const topPlayer = data[0]; 
-                      
                       const name = topPlayer.playerName || topPlayer.PlayerName || "Unknown";
                       const points = topPlayer.totalPoints !== undefined ? topPlayer.totalPoints : (topPlayer.TotalPoints || 0);
 
@@ -204,14 +180,21 @@
         window.location.href = "signin.html";
       }
 
+      // Throttled Mouse Movement
+      let ticking = false;
       function TrackMouseMovement(event) {
-        document.documentElement.style.setProperty("--mx", (event.clientX / window.innerWidth) * 100 + "%");
-        document.documentElement.style.setProperty("--my", (event.clientY / window.innerHeight) * 100 + "%");
+          if (!ticking) {
+              window.requestAnimationFrame(() => {
+                  document.documentElement.style.setProperty("--mx", (event.clientX / window.innerWidth) * 100 + "%");
+                  document.documentElement.style.setProperty("--my", (event.clientY / window.innerHeight) * 100 + "%");
+                  ticking = false;
+              });
+              ticking = true;
+          }
       }
       document.addEventListener("mousemove", TrackMouseMovement);
 
       let hubZoom = parseFloat(localStorage.getItem("hubZoom"));
-
       if (isNaN(hubZoom)) {
           hubZoom = window.innerWidth < 768 ? 0.8 : 1.0; 
       }
@@ -225,11 +208,8 @@
           if (gameGrid) {
               gameGrid.style.transform = `scale(${hubZoom})`;
               gameGrid.style.transformOrigin = "top center";
-              
               gameGrid.style.width = `${100 / hubZoom}%`;
-              
               gameGrid.style.marginBottom = hubZoom < 1 ? `-${(1 - hubZoom) * 80}vh` : "0px";
-              
               localStorage.setItem("hubZoom", hubZoom);
           }
       }
