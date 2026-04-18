@@ -9,11 +9,10 @@ using System.Text;
 AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
 var builder = WebApplication.CreateBuilder(args);
 
-// 1. DATABASE CONNECTION (Now using Render PostgreSQL)
-// Converted your Render URL into the C# standard format
-var connectionString = builder.Configuration["RENDER_DB_URL"];
+// 1. DATABASE CONNECTION (Updated for Local SQL Server)
+var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 builder.Services.AddDbContext<GameContext>(options =>
-    options.UseNpgsql(connectionString)); 
+    options.UseSqlServer(connectionString));
 
 // 2. REGISTER YOUR AUTH SERVICE
 builder.Services.AddScoped<IAuthService, AuthService>();
@@ -51,11 +50,11 @@ var app = builder.Build();
 
 // 5. AUTO-MIGRATION (The "Table Builder")
 // Changed to Migrate() so it reads your new Entity Framework Migrations folder
-using (var scope = app.Services.CreateScope())
+/* using (var scope = app.Services.CreateScope())
 {
     var context = scope.ServiceProvider.GetRequiredService<GameContext>();
     context.Database.Migrate(); 
-}
+} */
 
 // 6. CONFIGURE PIPELINE
 if (app.Environment.IsDevelopment())
